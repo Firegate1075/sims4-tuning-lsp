@@ -6,6 +6,8 @@ import org.eclipse.lemminx.services.extensions.save.ISaveContext;
 import org.eclipse.lsp4j.InitializeParams;
 
 public class Sims4TuningsLemminxExtension implements IXMLExtension {
+    private TuningCompletionParticipant completionParticipant;
+
     @Override
     public void doSave(ISaveContext context) {
         // Called when settings or XML document are saved.
@@ -14,10 +16,13 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
     @Override
     public void start(InitializeParams params, XMLExtensionsRegistry registry) {
         // Register here completion, hover, etc participants
+        completionParticipant = new TuningCompletionParticipant();
+        registry.registerCompletionParticipant(completionParticipant);
     }
 
     @Override
     public void stop(XMLExtensionsRegistry registry) {
         // Unregister here completion, hover, etc participants
+        registry.unregisterCompletionParticipant(completionParticipant);
     }
 }
