@@ -1,8 +1,11 @@
 package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class TunableList implements ITuningDescriptionElement {
@@ -44,6 +47,11 @@ public class TunableList implements ITuningDescriptionElement {
     @Nullable
     @JacksonXmlProperty(isAttribute = true)
     private String min;
+
+    // sub elements
+
+    @JacksonXmlElementWrapper(useWrapping = false)
+    private final List<ITuningDescriptionElement> tunableElements = new ArrayList<>();
 
 
     public String getClassName() {
@@ -116,5 +124,9 @@ public class TunableList implements ITuningDescriptionElement {
 
     public void setMin(@Nullable String min) {
         this.min = min;
+    }
+
+    public List<ITuningDescriptionElement> getTunableElements() {
+        return tunableElements;
     }
 }

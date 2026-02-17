@@ -1,8 +1,11 @@
 package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class TunableTuple implements ITuningDescriptionElement {
@@ -32,6 +35,12 @@ public class TunableTuple implements ITuningDescriptionElement {
     @Nullable
     @JacksonXmlProperty(isAttribute = true)
     private String group;
+
+    // sub elements
+
+    @JacksonXmlElementWrapper(useWrapping = false)
+    private final List<ITuningDescriptionElement> tunableElements = new ArrayList<>();
+
 
     public String getClassName() {
         return className;
@@ -79,6 +88,10 @@ public class TunableTuple implements ITuningDescriptionElement {
 
     public void setDescription(@Nullable String description) {
         this.description = description;
+    }
+
+    public List<ITuningDescriptionElement> getTunableElements() {
+        return tunableElements;
     }
 
 }
