@@ -9,33 +9,33 @@ public class TunableVariant implements ITunableElement {
     // mandatory attributes
 
     @JacksonXmlProperty(isAttribute = true)
-    String type;
+    private String type;
 
     @JacksonXmlProperty(isAttribute = true, localName = "class")
-    String className;
+    private String className;
 
     @JacksonXmlProperty(isAttribute = true, localName = "default")
-    String defaultValue;
+    private String defaultValue;
 
     @JacksonXmlProperty(isAttribute = true, localName = "Deprecated")
-    boolean deprecated;
+    private boolean deprecated;
 
     @JacksonXmlProperty(isAttribute = true)
-    String group;
+    private String group;
 
     // optional attributes
 
     @Nullable
     @JacksonXmlProperty(isAttribute = true)
-    String name;
+    private String name;
 
     @Nullable
     @JacksonXmlProperty(isAttribute = true)
-    String display;
+    private String display;
 
     @Nullable
     @JacksonXmlProperty(isAttribute = true)
-    String description;
+    private String description;
 
     public String getType() {
         return type;
