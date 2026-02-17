@@ -1,4 +1,5 @@
 package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
 
-public class TunableList implements ITunableElement{
+public interface ITunableElement {
+
 }

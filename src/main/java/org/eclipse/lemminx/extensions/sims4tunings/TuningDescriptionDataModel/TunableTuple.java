@@ -1,4 +1,4 @@
 package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
 
-public class TunableTuple extends TunableElement{
+public class TunableTuple implements ITunableElement{
 }
