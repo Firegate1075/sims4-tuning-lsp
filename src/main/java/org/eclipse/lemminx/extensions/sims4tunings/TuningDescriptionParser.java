@@ -34,18 +34,16 @@ public class TuningDescriptionParser {
                         })
                         .map(path -> {
                             try {
-                                return (Optional<TuningRoot>) Optional.of((TuningRoot) unmarshaller.unmarshal(path.toFile()));
+                                return (TuningRoot) unmarshaller.unmarshal(path.toFile());
                             } catch (JAXBException e) {
                                 LOGGER.severe("Failed to parse tdesc file " + path);
                                 throw new RuntimeException(e.fillInStackTrace());
-                                //return Optional.<TuningRoot>empty();
                             }
                         })
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
                         .toList();
 
-                System.out.println(parsedTuningDescriptionFiles);
+
+
 
             } catch (IOException e) {
                 LOGGER.severe("Failed to open tdesc folder with path: " + tdesc_path);
