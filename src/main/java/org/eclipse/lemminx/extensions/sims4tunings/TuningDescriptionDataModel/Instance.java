@@ -21,5 +21,5 @@ public class Instance {
     String parents;
 
     @JacksonXmlElementWrapper(useWrapping = false)
-    List<TunableElement> tunableElements;
+    List<ITunableElement> tunableElements;
 }
