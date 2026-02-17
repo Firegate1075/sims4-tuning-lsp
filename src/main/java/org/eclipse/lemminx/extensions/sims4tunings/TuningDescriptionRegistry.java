@@ -24,7 +24,8 @@ public class TuningDescriptionRegistry {
         if (element instanceof InstanceElement instanceElement) {
             className = instanceElement.getClassName();
             instanceElementTuningDescriptionMap.put(className, instanceElement);
-        } else if (element instanceof ClassElement classElement) {
+        } else if (element instanceof ModuleElement moduleElement) {
+            // TODO: a module may contain several classes, handle separately
             className = classElement.getName();
         } else if (element instanceof TdescFrag tdescFrag) {
             ITuningDescriptionElement child = tdescFrag.getTunableElements().getFirst();
@@ -38,6 +39,9 @@ public class TuningDescriptionRegistry {
         }
 
         if (!className.isEmpty()) {
+            if (tuningDescriptionElementMap.containsKey(className)) {
+                LOGGER.warning("Class " + className + " already contained in registry");
+            }
             tuningDescriptionElementMap.put(className, element);
         }
     }
