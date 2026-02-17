@@ -1,5 +1,16 @@
 package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
 
-public class EnumItem implements ITuningDescriptionElement {
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
+public class EnumItem implements ITuningDescriptionElement {
+    @JacksonXmlProperty(isAttribute = true)
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
