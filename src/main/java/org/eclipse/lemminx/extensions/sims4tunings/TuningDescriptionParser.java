@@ -20,7 +20,7 @@ public class TuningDescriptionParser {
     private static final String PROJECT_DIRECTORY = System.getProperty("user.dir");
     private static final Logger LOGGER = Logger.getLogger(TuningDescriptionParser.class.getName());
 
-    public static void parseTuningDescriptionXML() {
+    public static List<TuningRoot> parseTuningDescriptionXML() {
         Path tdesc_path = Paths.get(PROJECT_DIRECTORY + "/tdesc");
 
         try {
@@ -28,7 +28,8 @@ public class TuningDescriptionParser {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
             try (Stream<Path> stream = Files.walk(tdesc_path)) {
-                List<TuningRoot> parsedTuningDescriptionFiles = stream
+
+                return stream
                         .filter(path -> {
                             return path.toString().endsWith(".tdesc") || path.toString().endsWith(".tdescfrag");
                         })
@@ -41,9 +42,6 @@ public class TuningDescriptionParser {
                             }
                         })
                         .toList();
-
-
-
 
             } catch (IOException e) {
                 LOGGER.severe("Failed to open tdesc folder with path: " + tdesc_path);
