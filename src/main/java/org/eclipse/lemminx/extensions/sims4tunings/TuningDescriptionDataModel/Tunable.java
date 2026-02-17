@@ -5,7 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class Tunable implements ITunableElement{
+public class Tunable implements ITuningDescriptionElement {
     // mandatory attributes
 
     @JacksonXmlProperty(isAttribute = true, localName = "class")
