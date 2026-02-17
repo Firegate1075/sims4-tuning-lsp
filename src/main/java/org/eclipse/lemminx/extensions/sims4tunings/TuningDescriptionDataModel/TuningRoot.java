@@ -1,15 +1,30 @@
 package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import jakarta.xml.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TuningRoot {
+@XmlRootElement(name = "TuningRoot")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class TuningRoot implements ITuningDescriptionElement {
 
     // sub elements
 
-    @JacksonXmlElementWrapper(useWrapping = false)
+    @XmlElements({
+            @XmlElement(name = "Class", type = ClassElement.class),
+            @XmlElement(name = "Deleted", type = DeletedElement.class),
+            @XmlElement(name = "EnumItem", type = EnumItem.class),
+            @XmlElement(name = "Instance", type = InstanceElement.class),
+            @XmlElement(name = "Module", type = ModuleElement.class),
+            @XmlElement(name = "TdescFrag", type = TdescFrag.class),
+            @XmlElement(name = "TdescFragTag", type = TdescFragTag.class),
+            @XmlElement(name = "Tunable", type = Tunable.class),
+            @XmlElement(name = "TunableEnum", type = TunableEnum.class),
+            @XmlElement(name = "TunableList", type = TunableList.class),
+            @XmlElement(name = "TunableTuple", type = TunableTuple.class),
+            @XmlElement(name = "TunableVariant", type = TunableVariant.class)
+    })
     private final List<ITuningDescriptionElement> tunableElements = new ArrayList<>();
 
     public List<ITuningDescriptionElement> getTunableElements() {

@@ -1,30 +1,35 @@
 package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
+@XmlRootElement(name = "TdescFragTag")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class TdescFragTag implements ITuningDescriptionElement{
     // mandatory attributes
 
-    @JacksonXmlProperty(isAttribute = true, localName = "class")
+    @XmlAttribute(name = "class")
     private String className;
 
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String description;
 
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String group;
 
     // optional attributes
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String name;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String display;
 
     public String getClassName() {

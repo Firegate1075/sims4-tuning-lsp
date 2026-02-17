@@ -1,9 +1,14 @@
 package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement(name = "Deleted")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DeletedElement implements ITuningDescriptionElement{
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String name;
 
     public String getName() {

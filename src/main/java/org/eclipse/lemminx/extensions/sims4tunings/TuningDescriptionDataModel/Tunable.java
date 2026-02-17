@@ -1,68 +1,73 @@
 package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
+@XmlRootElement(name = "Tunable")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Tunable implements ITuningDescriptionElement {
     // mandatory attributes
 
-    @JacksonXmlProperty(isAttribute = true, localName = "class")
+    @XmlAttribute(name = "class")
     String className;
 
     // optional attributes
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String name;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String display;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String type;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true, localName = "default")
+    @XmlAttribute(name = "default")
     private String defaultValue;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String description;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true, localName = "needs_tuning")
+    @XmlAttribute(name = "needs_tuning")
     private Boolean needsTuning;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true, localName = "Deprecated")
+    @XmlAttribute(name = "Deprecated")
     private Boolean deprecated;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String group;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String min;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String max;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true, localName = "allow_none")
+    @XmlAttribute(name = "allow_none")
     private Boolean allowNone;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true, localName = "pack_safe")
+    @XmlAttribute(name = "pack_safe")
     private Boolean packSafe;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String restrict;
 
     public String getClassName() {

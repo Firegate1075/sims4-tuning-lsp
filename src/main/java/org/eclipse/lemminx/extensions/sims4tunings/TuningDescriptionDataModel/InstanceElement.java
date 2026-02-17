@@ -1,45 +1,57 @@
 package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import jakarta.xml.bind.annotation.*;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@XmlRootElement(name = "Instance")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class InstanceElement implements ITuningDescriptionElement{
     // mandatory attributes
 
-    @JacksonXmlProperty(isAttribute = true, localName = "instance_type")
+    @XmlAttribute(name = "instance_type")
     private String instanceType;
 
-    @JacksonXmlProperty(isAttribute = true, localName = "class")
+    @XmlAttribute(name = "class")
     private String className;
 
-    @JacksonXmlProperty(isAttribute = true, localName = "module")
+    @XmlAttribute(name = "module")
     private String moduleName;
 
     // optional attributes
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String description;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true, localName = "instance_subclasses_only")
+    @XmlAttribute(name = "instance_subclasses_only")
     private Boolean instanceSubclassesOnly;
 
     @Nullable
-    @JacksonXmlProperty(isAttribute = true)
+    @XmlAttribute
     private String parents;
 
 
     // sub elements
 
-    @JacksonXmlElementWrapper(useWrapping = false)
+    @XmlElements({
+            @XmlElement(name = "Class", type = ClassElement.class),
+            @XmlElement(name = "Deleted", type = DeletedElement.class),
+            @XmlElement(name = "EnumItem", type = EnumItem.class),
+            @XmlElement(name = "Instance", type = InstanceElement.class),
+            @XmlElement(name = "Module", type = ModuleElement.class),
+            @XmlElement(name = "TdescFrag", type = TdescFrag.class),
+            @XmlElement(name = "TdescFragTag", type = TdescFragTag.class),
+            @XmlElement(name = "Tunable", type = Tunable.class),
+            @XmlElement(name = "TunableEnum", type = TunableEnum.class),
+            @XmlElement(name = "TunableList", type = TunableList.class),
+            @XmlElement(name = "TunableTuple", type = TunableTuple.class),
+            @XmlElement(name = "TunableVariant", type = TunableVariant.class)
+    })
     private final List<ITuningDescriptionElement> tunableElements = new ArrayList<>();
 
 
