@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Instance {
+public class InstanceElement {
     // mandatory attributes
 
     @JacksonXmlProperty(isAttribute = true, localName = "instance_type")
