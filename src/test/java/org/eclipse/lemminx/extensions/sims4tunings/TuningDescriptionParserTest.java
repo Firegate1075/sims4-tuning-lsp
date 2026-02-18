@@ -10,6 +10,10 @@ public class TuningDescriptionParserTest {
         TuningDescriptionRegistry registry = new TuningDescriptionRegistry();
 
         parsedTuningDescriptions.forEach(registry::addTuningDescription);
+        var r = registry.getClassElementByPath("statistics-statistic_conditions.HiddenOrShownCondition.Timing");
+        r = registry.getClassElementByPath("ui-ui_dialog.UiDialogResponse.UiDialogUiRequest");
+        r = registry.getClassElementByPath("ui_dialog_notification.UiDialogNotification.UiDialogNotificationLevel");
+        r = registry.getClassElementByPath("ui_dialog_notification.UiDialogNotification.UiDialogNotificationAutoDeleteReason");
         System.out.println("hello");
     }
 }
