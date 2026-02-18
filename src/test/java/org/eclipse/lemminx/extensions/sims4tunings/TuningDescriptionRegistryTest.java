@@ -3,20 +3,25 @@ package org.eclipse.lemminx.extensions.sims4tunings;
 import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.InstanceElement;
 import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.TdescFrag;
 import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.TunableList;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class TuningDescriptionRegistryTest {
-
+    @BeforeEach
+    public void setup() throws NoSuchFieldException, IllegalAccessException {
+        Field instance = TuningDescriptionRegistry.class.getDeclaredField("instance");
+        instance.setAccessible(true);
+        instance.set(null, null);
+    }
     @Test
     void addTuningDescription() {
         var parsedTuningDescriptions = TuningDescriptionParser.parseTuningDescriptionXML();
 
         assert(parsedTuningDescriptions.size() == 1764);
-        TuningDescriptionRegistry registry = new TuningDescriptionRegistry();
+        TuningDescriptionRegistry registry = TuningDescriptionRegistry.getInstance();
 
         // add all the tuning descriptions
         parsedTuningDescriptions.forEach(registry::addTuningDescription);
@@ -27,7 +32,7 @@ class TuningDescriptionRegistryTest {
         var parsedTuningDescriptions = TuningDescriptionParser.parseTuningDescriptionXML();
 
         assert(parsedTuningDescriptions.size() == 1764);
-        TuningDescriptionRegistry registry = new TuningDescriptionRegistry();
+        TuningDescriptionRegistry registry = TuningDescriptionRegistry.getInstance();
 
         // add all the tuning descriptions
         parsedTuningDescriptions.forEach(registry::addTuningDescription);
@@ -43,7 +48,7 @@ class TuningDescriptionRegistryTest {
         var parsedTuningDescriptions = TuningDescriptionParser.parseTuningDescriptionXML();
 
         assert(parsedTuningDescriptions.size() == 1764);
-        TuningDescriptionRegistry registry = new TuningDescriptionRegistry();
+        TuningDescriptionRegistry registry = TuningDescriptionRegistry.getInstance();
 
         parsedTuningDescriptions.forEach(registry::addTuningDescription);
         var r = registry.getClassElementByPath("statistics-statistic_conditions.HiddenOrShownCondition.Timing");
@@ -65,7 +70,7 @@ class TuningDescriptionRegistryTest {
         var parsedTuningDescriptions = TuningDescriptionParser.parseTuningDescriptionXML();
 
         assert(parsedTuningDescriptions.size() == 1764);
-        TuningDescriptionRegistry registry = new TuningDescriptionRegistry();
+        TuningDescriptionRegistry registry = TuningDescriptionRegistry.getInstance();
 
         // add all the tuning descriptions
         parsedTuningDescriptions.forEach(registry::addTuningDescription);
