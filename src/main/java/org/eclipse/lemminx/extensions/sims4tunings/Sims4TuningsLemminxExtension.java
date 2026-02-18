@@ -3,7 +3,6 @@ package org.eclipse.lemminx.extensions.sims4tunings;
 import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.TuningRoot;
 import org.eclipse.lemminx.services.extensions.IXMLExtension;
 import org.eclipse.lemminx.services.extensions.XMLExtensionsRegistry;
-import org.eclipse.lemminx.services.extensions.commands.IXMLCommandService;
 import org.eclipse.lemminx.services.extensions.save.ISaveContext;
 import org.eclipse.lsp4j.InitializeParams;
 
@@ -12,6 +11,8 @@ import java.util.logging.Logger;
 
 public class Sims4TuningsLemminxExtension implements IXMLExtension {
     private TuningCompletionParticipant completionParticipant;
+    private TuningHashQuickFixProvider tuningHashQuickFixProvider;
+    private TuningHashDiagnosticsProvider tuningHashDiagnosticsProvider;
 
     private final static Logger LOGGER = Logger.getLogger(Sims4TuningsLemminxExtension.class.getName());
 
@@ -31,6 +32,10 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
 
         completionParticipant = new TuningCompletionParticipant(tuningDescriptionRegistry);
         registry.registerCompletionParticipant(completionParticipant);
+        tuningHashQuickFixProvider = new TuningHashQuickFixProvider();
+        registry.registerCodeActionParticipant(tuningHashQuickFixProvider);
+        tuningHashDiagnosticsProvider = new TuningHashDiagnosticsProvider();
+        registry.registerDiagnosticsParticipant(tuningHashDiagnosticsProvider);
 
         LOGGER.info("Sims4TuningsLemminxExtension initialized");
     }
@@ -39,5 +44,10 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
     public void stop(XMLExtensionsRegistry registry) {
         // Unregister here completion, hover, etc participants
         registry.unregisterCompletionParticipant(completionParticipant);
+        completionParticipant = null;
+        registry.unregisterCodeActionParticipant(tuningHashQuickFixProvider);
+        tuningHashQuickFixProvider = null;
+        registry.unregisterDiagnosticsParticipant(tuningHashDiagnosticsProvider);
+        tuningHashDiagnosticsProvider = null;
     }
 }
