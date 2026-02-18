@@ -88,43 +88,31 @@ public class TuningDescriptionRegistry {
                 .filter(ClassElement.class::isInstance)
                 .map(ClassElement.class::cast).toList();
 
-        for (ClassElement classElement : children) {
-            // follow path
-            if (classElement.getName().equals(pathDeque.peekFirst())) {
-                pathDeque.removeFirst();
-                Optional<ClassElement> result = findClassElementRecursively(classElement, pathDeque);
-                if (result.isPresent()) {
-                    return result;
-                }
-
-            }
-        }
-        return Optional.empty();
+        return findClassElementRecursively(children, pathDeque);
     }
 
-    private Optional<ClassElement> findClassElementRecursively(ClassElement root, Deque<String> pathDeque) {
-        // found our path
-        if (pathDeque.isEmpty()) {
-            return Optional.of(root);
-        }
-
-        // check children
-        List<ClassElement> children = root.getTunableElements().stream()
-                .filter(ClassElement.class::isInstance)
-                .map(ClassElement.class::cast).toList();
-
-        for (ClassElement classElement : children) {
-            // follow path
+    private Optional<ClassElement> findClassElementRecursively(List<ClassElement> classElements, Deque<String> pathDeque) {
+        for (ClassElement classElement : classElements) {
+            // check <Class> name
             if (classElement.getName().equals(pathDeque.peekFirst())) {
+                // found our next element
                 pathDeque.removeFirst();
-                Optional<ClassElement> result = findClassElementRecursively(classElement, pathDeque);
-                if (result.isPresent()) {
-                    return result;
+
+                if (pathDeque.isEmpty()) {
+                    // done, found our target ClassElement
+                    return Optional.of(classElement);
                 }
 
+                // continue searching children
+                List<ClassElement> children = classElement.getTunableElements().stream()
+                        .filter(ClassElement.class::isInstance)
+                        .map(ClassElement.class::cast).toList();
+
+                return findClassElementRecursively(children, pathDeque);
             }
         }
 
+        // target not found
         return Optional.empty();
     }
 
