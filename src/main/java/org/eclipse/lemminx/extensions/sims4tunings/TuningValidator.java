@@ -9,6 +9,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class TuningValidator {
     public static Optional<ITuningDescriptionElement> getDescriptionOfNode(DOMDocument document, DOMNode node) {
@@ -58,10 +59,7 @@ public class TuningValidator {
 
                 // if it was a TdescFrag, also add the content element
                 if (foundMatchingDescription.get() instanceof TdescFragTag tdescFragTag) {
-                    String className = tdescFragTag.getClassName();
-                    TdescFrag tdescFrag = TuningDescriptionRegistry.getInstance().getTdescFragByClassName(className).orElseThrow();
-                    ITuningDescriptionElement tdescFragContent = getTdescFragContent(tdescFrag);
-                    setTdescFragContentName(tdescFragContent, tdescFragTag.getName().orElse(null));
+                    ITuningDescriptionElement tdescFragContent = getTdescFragTagContent(tdescFragTag);
                     tuningDescriptionSequence.addLast(tdescFragContent);
                 }
             } else {
@@ -78,21 +76,14 @@ public class TuningValidator {
         return Optional.empty();
     }
 
-    private static boolean isTunableNodeMatchingDescription(DOMNode node, ITuningDescriptionElement description) {
+    public static boolean isTunableNodeMatchingDescription(DOMNode node, ITuningDescriptionElement description) {
         if (node.getNodeType() != DOMNode.ELEMENT_NODE) {
             return false;
         }
 
         // check for TdescFragTag
         if (description instanceof TdescFragTag tdescFragTag) {
-            String className = tdescFragTag.getClassName();
-            Optional<TdescFrag> tdescFrag = TuningDescriptionRegistry.getInstance().getTdescFragByClassName(className);
-            if (tdescFrag.isPresent()) {
-                // match against the entry of the corresponding TdescFrag content
-                ITuningDescriptionElement tdescFragContent = getTdescFragContent(tdescFrag.get());
-                setTdescFragContentName(tdescFragContent, tdescFragTag.getName().orElse(null));
-                return isTunableNodeMatchingDescription(node, tdescFragContent);
-            }
+            return isTunableNodeMatchingDescription(node, getTdescFragTagContent(tdescFragTag));
         }
 
         boolean isCorrectType = switch (node.getNodeName()) {
@@ -138,10 +129,13 @@ public class TuningValidator {
         return isCorrectType && hasCorrectName && variantTypeValid;
     }
 
-    private static ITuningDescriptionElement getTdescFragContent(TdescFrag tdescFrag) {
-        return tdescFrag.getTunableElements().getFirst();
-    }
-    private static void setTdescFragContentName(ITuningDescriptionElement tdescFragContent, String name) {
+    public static ITuningDescriptionElement getTdescFragTagContent(TdescFragTag tdescFragTag) {
+        String className = tdescFragTag.getClassName();
+        TdescFrag tdescFrag = TuningDescriptionRegistry.getInstance().getTdescFragByClassName(className).orElseThrow();
+        ITuningDescriptionElement tdescFragContent = tdescFrag.getTunableElements().getFirst();;
+
+        // set tdescFragContent's name attribute to that of the tag
+        String name = tdescFragTag.getName().orElse(null);
         switch (tdescFragContent) {
             case TunableVariant tunableVariant -> tunableVariant.setName(name);
             case TunableList tunableList -> tunableList.setName(name);
@@ -149,22 +143,67 @@ public class TuningValidator {
             default -> {
             }
         }
-    }
 
-    private static Optional<String> getTuningDescriptionElementName(ITuningDescriptionElement description) {
-        return switch (description) {
-            case Tunable tunable -> tunable.getName();
-            case TunableList tunableList -> tunableList.getName();
-            case TunableVariant tunableVariant -> tunableVariant.getName();
-            case TunableTuple tunableTuple -> tunableTuple.getName();
-            case TunableEnum tunableEnum -> tunableEnum.getName();
-            case EnumItem enumItem -> Optional.of(enumItem.getName());
+        // set the description of the tdescFrag content
+        Optional<String> contentDescription = switch (tdescFragContent) {
+            case TunableVariant tunableVariant -> tunableVariant.getDescription();
+            case TunableList tunableList -> tunableList.getDescription();
+            case TunableTuple tunableTuple -> tunableTuple.getDescription();
             default -> Optional.empty();
         };
+        String tdescFragTagDescription = tdescFragTag.getDescription();
+        String description = contentDescription.orElse("") + ": " + tdescFragTagDescription;
+
+        switch (tdescFragContent) {
+            case TunableVariant tunableVariant -> tunableVariant.setDescription(description);
+            case TunableList tunableList -> tunableList.setDescription(description);
+            case TunableTuple tunableTuple -> tunableTuple.setDescription(description);
+            default -> {
+            }
+        }
+
+        // set the display value of the tdescFrag content to the tag's
+        String display = tdescFragTag.getDisplay().orElse(null);
+        switch (tdescFragContent) {
+            case TunableVariant tunableVariant -> tunableVariant.setDisplay(display);
+            case TunableList tunableList -> tunableList.setDisplay(display);
+            case TunableTuple tunableTuple -> tunableTuple.setDisplay(display);
+            default -> {
+            }
+        }
+        return tdescFragContent;
     }
 
-    private static List<ITuningDescriptionElement> getChildrenOfTuningDescriptionElement(ITuningDescriptionElement parent) {
-        return switch (parent) {
+    public static Optional<String> getTuningDescriptionElementName(ITuningDescriptionElement description) {
+        if (description instanceof IHasName iHasName) {
+            return Optional.of(iHasName.getName());
+        } else if (description instanceof IHasOptionalName iHasOptionalName) {
+            return iHasOptionalName.getName();
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<String> getTuningDescriptionElementDisplay(ITuningDescriptionElement description) {
+        if (description instanceof IHasOptionalDisplay iHasOptionalDisplay) {
+            return iHasOptionalDisplay.getDisplay();
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<String> getTuningDescriptionElementDescription(ITuningDescriptionElement description) {
+        if (description instanceof IHasDescription iHasDescription) {
+            return Optional.of(iHasDescription.getDescription());
+        } else if (description instanceof IHasOptionalDescription iHasOptionalDescription) {
+            return iHasOptionalDescription.getDescription();
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public static List<ITuningDescriptionElement> getChildrenOfTuningDescriptionElement(ITuningDescriptionElement parent) {
+        List<ITuningDescriptionElement> children =  switch (parent) {
             case InstanceElement instanceElement -> instanceElement.getTunableElements();
             case TunableList tunableList -> tunableList.getTunableElements();
             case TunableVariant tunableVariant -> tunableVariant.getTunableElements();
@@ -174,5 +213,17 @@ public class TuningValidator {
             case TdescFrag tdescFrag -> tdescFrag.getTunableElements();
             default -> List.of();
         };
+
+        // resolve "parent" attribute
+        if (parent instanceof InstanceElement instanceElement) {
+            if (instanceElement.getParents().isPresent()) {
+                String parentClassName = instanceElement.getParents().get().split(",")[0];
+                Optional<InstanceElement> parentInstance = TuningDescriptionRegistry.getInstance().getInstanceElementByClassName(parentClassName);
+
+                return Stream.concat(children.stream(), parentInstance.orElseThrow().getTunableElements().stream()).toList();
+            }
+        }
+
+        return children;
     }
 }

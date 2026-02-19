@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @XmlRootElement(name = "TdescFragTag")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TdescFragTag implements ITuningDescriptionElement{
+public class TdescFragTag implements ITuningDescriptionElement, IHasClass, IHasDescription, IHasOptionalName{
     // mandatory attributes
 
     @XmlAttribute(name = "class")

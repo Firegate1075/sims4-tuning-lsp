@@ -7,7 +7,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "EnumItem")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class EnumItem implements ITuningDescriptionElement {
+public class EnumItem implements ITuningDescriptionElement, IHasName {
     @XmlAttribute
     private String name;
 

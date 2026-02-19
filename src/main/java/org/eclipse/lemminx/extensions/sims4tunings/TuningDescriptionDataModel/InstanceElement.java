@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @XmlRootElement(name = "Instance")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class InstanceElement implements ITuningDescriptionElement{
+public class InstanceElement implements ITuningDescriptionElement, IHasClass{
     // mandatory attributes
 
     @XmlAttribute(name = "instance_type")

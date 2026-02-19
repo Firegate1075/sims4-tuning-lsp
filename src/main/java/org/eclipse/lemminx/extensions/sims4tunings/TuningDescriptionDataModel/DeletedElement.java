@@ -7,7 +7,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "Deleted")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class DeletedElement implements ITuningDescriptionElement{
+public class DeletedElement implements ITuningDescriptionElement, IHasName{
     @XmlAttribute
     private String name;
 

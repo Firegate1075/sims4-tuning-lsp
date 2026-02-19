@@ -7,7 +7,7 @@ import java.util.List;
 
 @XmlRootElement(name = "Class")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ClassElement implements ITuningDescriptionElement {
+public class ClassElement implements ITuningDescriptionElement, IHasName {
     @XmlAttribute
     private String name;
 

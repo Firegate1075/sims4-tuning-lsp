@@ -3,6 +3,8 @@ package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
 
 import jakarta.xml.bind.annotation.XmlSeeAlso;
 
+import java.util.Optional;
+
 @XmlSeeAlso({
         ClassElement.class,
         DeletedElement.class,
@@ -19,5 +21,4 @@ import jakarta.xml.bind.annotation.XmlSeeAlso;
         TuningRoot.class
 })
 public interface ITuningDescriptionElement {
-
 }
