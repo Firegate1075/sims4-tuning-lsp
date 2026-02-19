@@ -131,6 +131,10 @@ public class TuningDescriptionRegistry {
         return Optional.ofNullable(tdescFragTuningDescriptionMap.get(className));
     }
 
+    public Optional<ModuleElement> getModuleElementByName(String moduleName) {
+        return Optional.ofNullable(moduleElementsTuningDescriptionMap.get(moduleName));
+    }
+
     public List<String> getClassNamesOfInstanceElementEntries() {
         return new ArrayList<>(instanceElementTuningDescriptionMap.keySet());
     }
