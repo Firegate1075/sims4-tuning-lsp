@@ -1,12 +1,9 @@
 package org.eclipse.lemminx.extensions.sims4tunings;
 
 import org.eclipse.lemminx.dom.DOMAttr;
-import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.dom.DOMNode;
-import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.ClassElement;
 import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.InstanceElement;
 import org.eclipse.lemminx.services.extensions.completion.CompletionParticipantAdapter;
-import org.eclipse.lemminx.services.extensions.completion.ICompletionParticipant;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionRequest;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionResponse;
 import org.eclipse.lemminx.utils.XMLPositionUtility;
@@ -17,13 +14,13 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class TuningCompletionParticipant extends CompletionParticipantAdapter {
+public class RootElementCompletionProvider extends CompletionParticipantAdapter {
 
-    private final static Logger LOGGER = Logger.getLogger(TuningCompletionParticipant.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(RootElementCompletionProvider.class.getName());
 
     private final TuningDescriptionRegistry registry;
 
-    public TuningCompletionParticipant(TuningDescriptionRegistry registry) {
+    public RootElementCompletionProvider(TuningDescriptionRegistry registry) {
         this.registry = registry;
     }
 

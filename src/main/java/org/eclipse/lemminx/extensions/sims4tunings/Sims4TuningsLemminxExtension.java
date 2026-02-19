@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class Sims4TuningsLemminxExtension implements IXMLExtension {
-    private TuningCompletionParticipant completionParticipant;
+    private RootElementCompletionProvider rootElementCompletionProvider;
     private TuningHashQuickFixProvider tuningHashQuickFixProvider;
     private TuningHashDiagnosticsProvider tuningHashDiagnosticsProvider;
 
@@ -30,8 +30,8 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
         TuningDescriptionRegistry tuningDescriptionRegistry = TuningDescriptionRegistry.getInstance();
         tuningRoots.forEach(tuningDescriptionRegistry::addTuningDescription);
 
-        completionParticipant = new TuningCompletionParticipant(tuningDescriptionRegistry);
-        registry.registerCompletionParticipant(completionParticipant);
+        rootElementCompletionProvider = new RootElementCompletionProvider(tuningDescriptionRegistry);
+        registry.registerCompletionParticipant(rootElementCompletionProvider);
         tuningHashQuickFixProvider = new TuningHashQuickFixProvider();
         registry.registerCodeActionParticipant(tuningHashQuickFixProvider);
         tuningHashDiagnosticsProvider = new TuningHashDiagnosticsProvider();
@@ -43,8 +43,8 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
     @Override
     public void stop(XMLExtensionsRegistry registry) {
         // Unregister here completion, hover, etc participants
-        registry.unregisterCompletionParticipant(completionParticipant);
-        completionParticipant = null;
+        registry.unregisterCompletionParticipant(rootElementCompletionProvider);
+        rootElementCompletionProvider = null;
         registry.unregisterCodeActionParticipant(tuningHashQuickFixProvider);
         tuningHashQuickFixProvider = null;
         registry.unregisterDiagnosticsParticipant(tuningHashDiagnosticsProvider);
