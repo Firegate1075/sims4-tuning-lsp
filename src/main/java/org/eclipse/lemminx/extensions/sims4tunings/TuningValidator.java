@@ -4,6 +4,7 @@ import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.dom.DOMNode;
 import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.*;
 
+import javax.annotation.Nullable;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -11,6 +12,8 @@ import java.util.Optional;
 
 public class TuningValidator {
     public static Optional<ITuningDescriptionElement> getDescriptionOfNode(DOMDocument document, DOMNode node) {
+        // TODO: does not check order of tunable tuples!
+
         if (node.getNodeType() != DOMNode.ELEMENT_NODE) {
             return Optional.empty();
         }
@@ -67,7 +70,7 @@ public class TuningValidator {
         }
 
         ITuningDescriptionElement candidate = tuningDescriptionSequence.removeLast();
-        ITuningDescriptionElement candidateParent = tuningDescriptionSequence.removeLast();
+        ITuningDescriptionElement candidateParent = tuningDescriptionSequence.peekLast();
         if (isTunableNodeMatchingDescription(node, candidate, candidateParent)) {
             // we have a final match
             return Optional.of(candidate);
@@ -76,7 +79,7 @@ public class TuningValidator {
         return Optional.empty();
     }
 
-    private static boolean isTunableNodeMatchingDescription(DOMNode node, ITuningDescriptionElement description, ITuningDescriptionElement parent) {
+    private static boolean isTunableNodeMatchingDescription(DOMNode node, ITuningDescriptionElement description, @Nullable ITuningDescriptionElement parent) {
         if (node.getNodeType() != DOMNode.ELEMENT_NODE) {
             return false;
         }
@@ -100,6 +103,8 @@ public class TuningValidator {
             case "V" -> description instanceof TunableVariant;
             case "U" -> description instanceof TunableTuple;
             case "E" -> description instanceof TunableEnum;
+            case "I" -> description instanceof InstanceElement;
+            case "M" -> description instanceof ModuleElement;
             // ignore other types
             default -> false;
         };

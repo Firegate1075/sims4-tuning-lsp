@@ -60,7 +60,7 @@ class TuningValidatorTest {
         XMLLanguageService xmlLanguageService = new XMLLanguageService();
         TextDocument document = new TextDocument(TEST_DOCUMENT, "test://test/test.xml");
         DOMDocument domDocument = DOMParser.getInstance().parse(document, xmlLanguageService.getResolverExtensionManager());
-        Optional<ITuningDescriptionElement> description = TuningValidator.getDescriptionOfNode(domDocument, domDocument.getDocumentElement().getFirstChild());
+        Optional<ITuningDescriptionElement> description = TuningValidator.getDescriptionOfNode(domDocument, domDocument.getDocumentElement());
         assertTrue(description.isPresent());
 
         DOMNode tunableNode = domDocument.getDocumentElement().getChild(2).getFirstChild().getFirstChild().getFirstChild().getFirstChild().getFirstChild().getFirstChild();
