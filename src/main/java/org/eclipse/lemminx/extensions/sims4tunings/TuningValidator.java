@@ -51,7 +51,7 @@ public class TuningValidator {
 
         for (DOMNode nodeInSequence : nodeSequence) {
             Optional<ITuningDescriptionElement> foundMatchingDescription = getChildrenOfTuningDescriptionElement(tuningDescriptionSequence.peekLast()).stream()
-                    .filter(child -> isTunableNodeMatchingDescription(nodeInSequence, child, tuningDescriptionSequence.peekLast()))
+                    .filter(child -> isTunableNodeMatchingDescription(nodeInSequence, child))
                     .findFirst();
             if (foundMatchingDescription.isPresent()) {
                 tuningDescriptionSequence.addLast(foundMatchingDescription.get());
@@ -70,8 +70,7 @@ public class TuningValidator {
         }
 
         ITuningDescriptionElement candidate = tuningDescriptionSequence.removeLast();
-        ITuningDescriptionElement candidateParent = tuningDescriptionSequence.peekLast();
-        if (isTunableNodeMatchingDescription(node, candidate, candidateParent)) {
+        if (isTunableNodeMatchingDescription(node, candidate)) {
             // we have a final match
             return Optional.of(candidate);
         }
@@ -79,7 +78,7 @@ public class TuningValidator {
         return Optional.empty();
     }
 
-    private static boolean isTunableNodeMatchingDescription(DOMNode node, ITuningDescriptionElement description, @Nullable ITuningDescriptionElement parent) {
+    private static boolean isTunableNodeMatchingDescription(DOMNode node, ITuningDescriptionElement description) {
         if (node.getNodeType() != DOMNode.ELEMENT_NODE) {
             return false;
         }
@@ -92,7 +91,7 @@ public class TuningValidator {
                 // match against the entry of the corresponding TdescFrag content
                 ITuningDescriptionElement tdescFragContent = getTdescFragContent(tdescFrag.get());
                 setTdescFragContentName(tdescFragContent, tdescFragTag.getName().orElse(null));
-                return isTunableNodeMatchingDescription(node, tdescFragContent, parent);
+                return isTunableNodeMatchingDescription(node, tdescFragContent);
             }
         }
 
@@ -131,7 +130,7 @@ public class TuningValidator {
             // check if one of the children has a name attribute that matches the variant type
             variantTypeValid = getChildrenOfTuningDescriptionElement(description).stream().anyMatch(
                     child -> getTuningDescriptionElementName(child).isPresent() && getTuningDescriptionElementName(child).get().equals(node.getAttribute("t")));
-        } else if (parent instanceof TunableVariant tunableVariant) {
+        } else if (node.getParentNode().getNodeName().equals("V")) {
             //check that the name actually matches the parent-variant's type
             variantTypeValid = node.getAttribute("n").equals(node.getParentNode().getAttribute("t"));
         }
