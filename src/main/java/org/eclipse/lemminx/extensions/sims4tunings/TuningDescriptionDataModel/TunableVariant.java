@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @XmlRootElement(name = "TunableVariant")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TunableVariant implements ITuningDescriptionElement, IHasClass, IHasOptionalName, IHasOptionalDisplay, IHasOptionalDescription {
+public class TunableVariant implements ITuningDescriptionElement, IHasClass, IHasOptionalName, IHasOptionalDisplay, IHasOptionalDescription, ITunable {
     // mandatory attributes
 
     @XmlAttribute
@@ -126,5 +126,9 @@ public class TunableVariant implements ITuningDescriptionElement, IHasClass, IHa
 
     public List<ITuningDescriptionElement> getTunableElements() {
         return tunableElements;
+    }
+
+    public String getTunableTag() {
+        return "V";
     }
 }

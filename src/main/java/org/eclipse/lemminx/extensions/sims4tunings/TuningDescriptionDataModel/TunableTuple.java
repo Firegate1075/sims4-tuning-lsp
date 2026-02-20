@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @XmlRootElement(name = "TunableTuple")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TunableTuple implements ITuningDescriptionElement, IHasClass, IHasOptionalName, IHasOptionalDisplay, IHasOptionalDescription {
+public class TunableTuple implements ITuningDescriptionElement, IHasClass, IHasOptionalName, IHasOptionalDisplay, IHasOptionalDescription, ITunable {
     // mandatory attributes
 
     @XmlAttribute(name = "class")
@@ -108,4 +108,7 @@ public class TunableTuple implements ITuningDescriptionElement, IHasClass, IHasO
         return tunableElements;
     }
 
+    public String getTunableTag() {
+        return "U";
+    }
 }

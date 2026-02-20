@@ -7,7 +7,7 @@ import java.util.List;
 
 @XmlRootElement(name = "Class")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ClassElement implements ITuningDescriptionElement, IHasName {
+public class ClassElement implements ITuningDescriptionElement, IHasName, ITunable {
     @XmlAttribute
     private String name;
 
@@ -39,5 +39,9 @@ public class ClassElement implements ITuningDescriptionElement, IHasName {
 
     public List<ITuningDescriptionElement> getTunableElements() {
         return tunableElements;
+    }
+
+    public String getTunableTag() {
+        return "C";
     }
 }

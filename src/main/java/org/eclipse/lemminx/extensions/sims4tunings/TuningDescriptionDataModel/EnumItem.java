@@ -7,7 +7,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "EnumItem")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class EnumItem implements ITuningDescriptionElement, IHasName {
+public class EnumItem implements ITuningDescriptionElement, IHasName, ITunable {
     @XmlAttribute
     private String name;
 
@@ -17,5 +17,10 @@ public class EnumItem implements ITuningDescriptionElement, IHasName {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String getTunableTag() {
+        return "T";
     }
 }

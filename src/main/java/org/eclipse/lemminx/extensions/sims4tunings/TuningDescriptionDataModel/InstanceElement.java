@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @XmlRootElement(name = "Instance")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class InstanceElement implements ITuningDescriptionElement, IHasClass{
+public class InstanceElement implements ITuningDescriptionElement, IHasClass, ITunable {
     // mandatory attributes
 
     @XmlAttribute(name = "instance_type")
@@ -105,5 +105,10 @@ public class InstanceElement implements ITuningDescriptionElement, IHasClass{
 
     public List<ITuningDescriptionElement> getTunableElements() {
         return tunableElements;
+    }
+
+    @Override
+    public String getTunableTag() {
+        return "I";
     }
 }
