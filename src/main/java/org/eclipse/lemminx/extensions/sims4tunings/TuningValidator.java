@@ -202,6 +202,45 @@ public class TuningValidator {
         }
     }
 
+    public static Optional<String> getTuningDescriptionElementClassName(ITuningDescriptionElement description) {
+        if (description instanceof IHasClass iHasClass) {
+            return Optional.of(iHasClass.getClassName());
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<String> getTuningDescriptionElementTypeName(ITuningDescriptionElement description) {
+        if (description instanceof IHasType iHasType) {
+            return Optional.of(iHasType.getType());
+        } else if (description instanceof IHasOptionalType iHasOptionalType) {
+            return iHasOptionalType.getType();
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<Integer> getIndexOfElementInList(DOMNode node) {
+        if (node.getNodeType() != DOMNode.ELEMENT_NODE) {
+            return Optional.empty();
+        }
+
+        DOMNode parent = node.getParentNode();
+        if (parent == null) {
+            return Optional.empty();
+        }
+
+        int index = 0;
+
+        for (DOMNode child : parent.getChildren()) {
+            if (child.equals(node)) {
+                break;
+            }
+            index++;
+        }
+        return Optional.of(index);
+    }
+
     public static List<ITuningDescriptionElement> getChildrenOfTuningDescriptionElement(ITuningDescriptionElement parent) {
         List<ITuningDescriptionElement> children =  switch (parent) {
             case InstanceElement instanceElement -> instanceElement.getTunableElements();
@@ -220,7 +259,7 @@ public class TuningValidator {
                 String parentClassName = instanceElement.getParents().get().split(",")[0];
                 Optional<InstanceElement> parentInstance = TuningDescriptionRegistry.getInstance().getInstanceElementByClassName(parentClassName);
 
-                return Stream.concat(children.stream(), parentInstance.orElseThrow().getTunableElements().stream()).toList();
+                return Stream.concat(children.stream(), getChildrenOfTuningDescriptionElement(parentInstance.orElseThrow()).stream()).toList();
             }
         }
 

@@ -16,6 +16,7 @@ class TuningDescriptionRegistryTest {
         instance.setAccessible(true);
         instance.set(null, null);
     }
+
     @Test
     void addTuningDescription() {
         var parsedTuningDescriptions = TuningDescriptionParser.parseTuningDescriptionXML();

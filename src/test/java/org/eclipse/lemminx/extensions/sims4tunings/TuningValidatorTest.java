@@ -7,13 +7,21 @@ import org.eclipse.lemminx.dom.DOMParser;
 import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.ITuningDescriptionElement;
 import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.Tunable;
 import org.eclipse.lemminx.services.XMLLanguageService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TuningValidatorTest {
+    @BeforeEach
+    public void setup() throws NoSuchFieldException, IllegalAccessException {
+        Field instance = TuningDescriptionRegistry.class.getDeclaredField("instance");
+        instance.setAccessible(true);
+        instance.set(null, null);
+    }
 
     private static final String TEST_DOCUMENT = """
 <?xml version="1.0" encoding="utf-8"?>

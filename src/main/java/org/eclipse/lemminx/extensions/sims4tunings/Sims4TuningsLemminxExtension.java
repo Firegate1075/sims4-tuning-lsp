@@ -13,6 +13,7 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
     private RootElementCompletionProvider rootElementCompletionProvider;
     private TuningHashQuickFixProvider tuningHashQuickFixProvider;
     private TuningHashDiagnosticsProvider tuningHashDiagnosticsProvider;
+    private TuningDescriptionCompletionProvider tuningDescriptionCompletionProvider;
 
     private final static Logger LOGGER = Logger.getLogger(Sims4TuningsLemminxExtension.class.getName());
 
@@ -36,6 +37,8 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
         registry.registerCodeActionParticipant(tuningHashQuickFixProvider);
         tuningHashDiagnosticsProvider = new TuningHashDiagnosticsProvider();
         registry.registerDiagnosticsParticipant(tuningHashDiagnosticsProvider);
+        tuningDescriptionCompletionProvider = new TuningDescriptionCompletionProvider();
+        registry.registerCompletionParticipant(tuningDescriptionCompletionProvider);
 
         LOGGER.info("Sims4TuningsLemminxExtension initialized");
     }
@@ -49,5 +52,7 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
         tuningHashQuickFixProvider = null;
         registry.unregisterDiagnosticsParticipant(tuningHashDiagnosticsProvider);
         tuningHashDiagnosticsProvider = null;
+        registry.unregisterCompletionParticipant(tuningDescriptionCompletionProvider);
+        tuningDescriptionCompletionProvider = null;
     }
 }
