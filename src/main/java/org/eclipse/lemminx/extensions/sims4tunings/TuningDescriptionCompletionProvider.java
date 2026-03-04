@@ -45,13 +45,29 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
         // tuples only suggest the next element in the tuple
         // TODO: children with default values are optional and should be skippable -> suggest children up to next chld without a default
         if (parentDescription instanceof TunableTuple tunableTuple) {
-            childrenDescriptions = tunableTuple.getTunableElements();
+            for (ITuningDescriptionElement childDescription : tunableTuple.getTunableElements()) {
+                if (childDescription instanceof TdescFragTag tdescFragTag) {
+                    childDescription = TuningValidator.getTdescFragTagContent(tdescFragTag);
 
+                    if (TuningValidator.isTunableNodeMatchingDescription(request.getNode(), childDescription)) {
+                        break;
+                    }
+
+                    if (childDescription instanceof IHasDefault || childDescription instanceof IHasOptionalDefault iHasOptionalDefault && iHasOptionalDefault.getDefaultValue().isPresent()) {
+                        Optional<CompletionItem> item = buildCompletionItemForElement(request, childDescription);
+                        item.ifPresent(completionItems::add);
+                        continue;
+                    }
+
+
+                }
+
+            }
             Optional<Integer> indexOfNode = TuningValidator.getIndexOfElementInList(request.getNode());
             Optional<CompletionItem> item = buildCompletionItemForElement(request, childrenDescriptions.get(indexOfNode.orElseThrow()));
             item.ifPresent(completionItems::add);
         } else {
-            // all other container elements suggest their children
+            // all other container elements suggest all their children
             for (ITuningDescriptionElement childDescription : childrenDescriptions) {
                 if (childDescription instanceof TdescFragTag tdescFragTag) {
                     childDescription = TuningValidator.getTdescFragTagContent(tdescFragTag);
@@ -64,8 +80,6 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
 
         return completionItems;
     }
-
-    // TODO: move buildCompletionItemForElement into separate method
 
     private Optional<CompletionItem> buildCompletionItemForElement(ICompletionRequest request, ITuningDescriptionElement element) {
         LOGGER.info("Building completion item for element of type " + element.getClass().getSimpleName());
@@ -114,15 +128,12 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
         item.setFilterText(textEdit.getNewText());
         item.setSortText(item.getLabel());
 
-        // TODO: build textedit text from element. e.g. add <E...> and content tag for TunableEnums
-        // TODO: Compute Display text, e.g. use "Display" if available, otherwise try name or even Tag type
-
         return Optional.of(item);
     }
 
     @Override
     public void onXMLContent(ICompletionRequest iCompletionRequest, ICompletionResponse iCompletionResponse, CancelChecker cancelChecker) throws Exception {
-
+        // TODO
     }
 
     @Override
@@ -132,7 +143,8 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
 
     @Override
     public void onAttributeValue(String s, ICompletionRequest iCompletionRequest, ICompletionResponse iCompletionResponse, CancelChecker cancelChecker) throws Exception {
-
+        // TODO
+        // for TunableVariant types -> also autocomplete the corresponding child element
     }
 
     @Override

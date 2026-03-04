@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @XmlRootElement(name = "TunableEnum")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TunableEnum implements ITuningDescriptionElement, IHasClass, IHasOptionalName, IHasOptionalDisplay, IHasOptionalDescription, ITunable, IHasType {
+public class TunableEnum implements ITuningDescriptionElement, IHasClass, IHasOptionalName, IHasOptionalDisplay, IHasOptionalDescription, ITunable, IHasType, IHasDefault {
     // mandatory attributes
 
     @XmlAttribute
