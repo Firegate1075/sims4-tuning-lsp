@@ -2,13 +2,9 @@ package org.eclipse.lemminx.extensions.sims4tunings;
 
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.dom.DOMNode;
-import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.*;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.*;
 
-import javax.annotation.Nullable;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class TuningValidator {
@@ -242,11 +238,9 @@ public class TuningValidator {
     }
 
     public static List<ITuningDescriptionElement> getChildrenOfTuningDescriptionElement(ITuningDescriptionElement parent) {
-        List<ITuningDescriptionElement> children;
+        List<ITuningDescriptionElement> children = new ArrayList<>();
         if (parent instanceof IHasChildren parentWithChildren) {
             children = parentWithChildren.getTunableElements();
-        } else {
-            children = List.of();
         }
 
         // resolve "parent" attribute for inherited elements

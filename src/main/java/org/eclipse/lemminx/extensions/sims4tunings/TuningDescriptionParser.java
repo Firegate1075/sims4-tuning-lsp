@@ -3,14 +3,13 @@ package org.eclipse.lemminx.extensions.sims4tunings;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
-import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.TuningRoot;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.TuningRoot;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 

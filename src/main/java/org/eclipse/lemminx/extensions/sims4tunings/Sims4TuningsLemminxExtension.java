@@ -1,6 +1,6 @@
 package org.eclipse.lemminx.extensions.sims4tunings;
 
-import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.TuningRoot;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.TuningRoot;
 import org.eclipse.lemminx.services.extensions.IXMLExtension;
 import org.eclipse.lemminx.services.extensions.XMLExtensionsRegistry;
 import org.eclipse.lemminx.services.extensions.save.ISaveContext;
@@ -20,6 +20,10 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
     @Override
     public void doSave(ISaveContext context) {
         // Called when settings or XML document are saved.
+        if (context.getType() == ISaveContext.SaveContextType.SETTINGS) {
+            // handle save of settings
+            updateSettings(context);
+        }
     }
 
     @Override
@@ -45,7 +49,7 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
 
     @Override
     public void stop(XMLExtensionsRegistry registry) {
-        // Unregister here completion, hover, etc participants
+        // Unregister here completion, hover, etc. participants
         registry.unregisterCompletionParticipant(rootElementCompletionProvider);
         rootElementCompletionProvider = null;
         registry.unregisterCodeActionParticipant(tuningHashQuickFixProvider);

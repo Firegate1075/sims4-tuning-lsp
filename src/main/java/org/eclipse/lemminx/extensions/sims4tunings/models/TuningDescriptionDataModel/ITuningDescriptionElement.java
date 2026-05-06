@@ -1,9 +1,7 @@
-package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
+package org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel;
 
 
 import jakarta.xml.bind.annotation.XmlSeeAlso;
-
-import java.util.Optional;
 
 @XmlSeeAlso({
         ClassElement.class,

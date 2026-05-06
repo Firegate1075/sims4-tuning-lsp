@@ -1,4 +1,4 @@
-package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
+package org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel;
 
 import jakarta.xml.bind.annotation.*;
 
@@ -7,13 +7,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@XmlRootElement(name = "TunableTuple")
+@XmlRootElement(name = "TunableVariant")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TunableTuple implements ITuningDescriptionElement, IHasClass, IHasOptionalName, IHasOptionalDisplay, IHasOptionalDescription, ITunable, IHasChildren {
+public class TunableVariant implements ITuningDescriptionElement, IHasClass, IHasOptionalName, IHasOptionalDisplay, IHasOptionalDescription, ITunable, IHasType, IHasDefault, IHasChildren {
     // mandatory attributes
+
+    @XmlAttribute
+    private String type;
 
     @XmlAttribute(name = "class")
     private String className;
+
+    @XmlAttribute(name = "default")
+    private String defaultValue;
+
+    @XmlAttribute(name = "Deprecated")
+    private boolean deprecated;
+
+    @XmlAttribute
+    private String group;
 
     // optional attributes
 
@@ -28,14 +40,6 @@ public class TunableTuple implements ITuningDescriptionElement, IHasClass, IHasO
     @Nullable
     @XmlAttribute
     private String description;
-
-    @Nullable
-    @XmlAttribute(name = "Deprecated")
-    private Boolean deprecated;
-
-    @Nullable
-    @XmlAttribute
-    private String group;
 
     // sub elements
 
@@ -56,6 +60,14 @@ public class TunableTuple implements ITuningDescriptionElement, IHasClass, IHasO
     private final List<ITuningDescriptionElement> tunableElements = new ArrayList<>();
 
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getClassName() {
         return className;
     }
@@ -64,19 +76,27 @@ public class TunableTuple implements ITuningDescriptionElement, IHasClass, IHasO
         this.className = className;
     }
 
-    public Optional<Boolean> isDeprecated() {
-        return Optional.ofNullable(deprecated);
+    public String getDefaultValue() {
+        return defaultValue;
     }
 
-    public void setDeprecated(@Nullable Boolean deprecated) {
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+    public void setDeprecated(boolean deprecated) {
         this.deprecated = deprecated;
     }
 
-    public Optional<String> getGroup() {
-        return Optional.ofNullable(group);
+    public String getGroup() {
+        return group;
     }
 
-    public void setGroup(@Nullable String group) {
+    public void setGroup(String group) {
         this.group = group;
     }
 
@@ -109,6 +129,6 @@ public class TunableTuple implements ITuningDescriptionElement, IHasClass, IHasO
     }
 
     public String getTunableTag() {
-        return "U";
+        return "V";
     }
 }

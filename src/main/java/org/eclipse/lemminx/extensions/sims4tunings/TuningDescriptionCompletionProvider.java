@@ -1,12 +1,11 @@
 package org.eclipse.lemminx.extensions.sims4tunings;
 
 import org.eclipse.lemminx.dom.DOMNode;
-import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.*;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.*;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionParticipant;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionRequest;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionResponse;
 import org.eclipse.lsp4j.CompletionItem;
-import org.eclipse.lsp4j.CompletionItemKind;
 import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.jsonrpc.CancelChecker;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;

@@ -1,13 +1,14 @@
-package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
+package org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel;
 
 import jakarta.xml.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlRootElement(name = "TdescFrag")
+@XmlRootElement(name = "TuningRoot")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TdescFrag implements ITuningDescriptionElement, IHasChildren {
+public class TuningRoot implements ITuningDescriptionElement, IHasChildren {
+
     // sub elements
 
     @XmlElements({

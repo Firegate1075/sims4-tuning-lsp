@@ -2,7 +2,7 @@ package org.eclipse.lemminx.extensions.sims4tunings;
 
 import org.eclipse.lemminx.dom.DOMAttr;
 import org.eclipse.lemminx.dom.DOMNode;
-import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.InstanceElement;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.InstanceElement;
 import org.eclipse.lemminx.services.extensions.completion.CompletionParticipantAdapter;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionRequest;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionResponse;

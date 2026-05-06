@@ -1,13 +1,23 @@
-package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
+package org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel;
 
 import jakarta.xml.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlRootElement(name = "TuningRoot")
+@XmlRootElement(name = "Module")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TuningRoot implements ITuningDescriptionElement, IHasChildren {
+public class ModuleElement implements ITuningDescriptionElement, IHasName, ITunable, IHasChildren {
+    @XmlAttribute
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     // sub elements
 
@@ -29,5 +39,10 @@ public class TuningRoot implements ITuningDescriptionElement, IHasChildren {
 
     public List<ITuningDescriptionElement> getTunableElements() {
         return tunableElements;
+    }
+
+    @Override
+    public String getTunableTag() {
+        return "M";
     }
 }

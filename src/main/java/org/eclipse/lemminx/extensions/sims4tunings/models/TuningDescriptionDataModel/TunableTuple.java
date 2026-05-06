@@ -1,4 +1,4 @@
-package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
+package org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel;
 
 import jakarta.xml.bind.annotation.*;
 
@@ -7,34 +7,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@XmlRootElement(name = "Instance")
+@XmlRootElement(name = "TunableTuple")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class InstanceElement implements ITuningDescriptionElement, IHasClass, ITunable, IHasChildren {
+public class TunableTuple implements ITuningDescriptionElement, IHasClass, IHasOptionalName, IHasOptionalDisplay, IHasOptionalDescription, ITunable, IHasChildren {
     // mandatory attributes
-
-    @XmlAttribute(name = "instance_type")
-    private String instanceType;
 
     @XmlAttribute(name = "class")
     private String className;
 
-    @XmlAttribute(name = "module")
-    private String moduleName;
-
     // optional attributes
+
+    @Nullable
+    @XmlAttribute
+    private String name;
+
+    @Nullable
+    @XmlAttribute
+    private String display;
 
     @Nullable
     @XmlAttribute
     private String description;
 
     @Nullable
-    @XmlAttribute(name = "instance_subclasses_only")
-    private Boolean instanceSubclassesOnly;
+    @XmlAttribute(name = "Deprecated")
+    private Boolean deprecated;
 
     @Nullable
     @XmlAttribute
-    private String parents;
-
+    private String group;
 
     // sub elements
 
@@ -55,14 +56,6 @@ public class InstanceElement implements ITuningDescriptionElement, IHasClass, IT
     private final List<ITuningDescriptionElement> tunableElements = new ArrayList<>();
 
 
-    public String getInstanceType() {
-        return instanceType;
-    }
-
-    public void setInstanceType(String instanceType) {
-        this.instanceType = instanceType;
-    }
-
     public String getClassName() {
         return className;
     }
@@ -71,12 +64,36 @@ public class InstanceElement implements ITuningDescriptionElement, IHasClass, IT
         this.className = className;
     }
 
-    public String getModuleName() {
-        return moduleName;
+    public Optional<Boolean> isDeprecated() {
+        return Optional.ofNullable(deprecated);
     }
 
-    public void setModuleName(String moduleName) {
-        this.moduleName = moduleName;
+    public void setDeprecated(@Nullable Boolean deprecated) {
+        this.deprecated = deprecated;
+    }
+
+    public Optional<String> getGroup() {
+        return Optional.ofNullable(group);
+    }
+
+    public void setGroup(@Nullable String group) {
+        this.group = group;
+    }
+
+    public Optional<String> getName() {
+        return Optional.ofNullable(name);
+    }
+
+    public void setName(@Nullable String name) {
+        this.name = name;
+    }
+
+    public Optional<String> getDisplay() {
+        return Optional.ofNullable(display);
+    }
+
+    public void setDisplay(@Nullable String display) {
+        this.display = display;
     }
 
     public Optional<String> getDescription() {
@@ -87,28 +104,11 @@ public class InstanceElement implements ITuningDescriptionElement, IHasClass, IT
         this.description = description;
     }
 
-    public Optional<Boolean> getInstanceSubclassesOnly() {
-        return Optional.ofNullable(instanceSubclassesOnly);
-    }
-
-    public void setInstanceSubclassesOnly(@Nullable Boolean instanceSubclassesOnly) {
-        this.instanceSubclassesOnly = instanceSubclassesOnly;
-    }
-
-    public Optional<String> getParents() {
-        return Optional.ofNullable(parents);
-    }
-
-    public void setParents(@Nullable String parents) {
-        this.parents = parents;
-    }
-
     public List<ITuningDescriptionElement> getTunableElements() {
         return tunableElements;
     }
 
-    @Override
     public String getTunableTag() {
-        return "I";
+        return "U";
     }
 }

@@ -1,13 +1,13 @@
-package org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel;
+package org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "EnumItem")
+@XmlRootElement(name = "Deleted")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class EnumItem implements ITuningDescriptionElement, IHasName, ITunable {
+public class DeletedElement implements ITuningDescriptionElement, IHasName{
     @XmlAttribute
     private String name;
 
@@ -17,10 +17,5 @@ public class EnumItem implements ITuningDescriptionElement, IHasName, ITunable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public String getTunableTag() {
-        return "T";
     }
 }

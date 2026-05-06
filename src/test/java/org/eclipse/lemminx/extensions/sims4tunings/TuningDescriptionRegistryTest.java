@@ -1,8 +1,8 @@
 package org.eclipse.lemminx.extensions.sims4tunings;
 
-import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.InstanceElement;
-import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.TdescFrag;
-import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.TunableList;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.InstanceElement;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.TdescFrag;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.TunableList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

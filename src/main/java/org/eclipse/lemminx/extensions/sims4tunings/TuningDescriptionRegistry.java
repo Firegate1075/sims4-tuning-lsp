@@ -1,6 +1,6 @@
 package org.eclipse.lemminx.extensions.sims4tunings;
 
-import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.*;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.*;
 
 import java.util.*;
 import java.util.logging.Logger;
