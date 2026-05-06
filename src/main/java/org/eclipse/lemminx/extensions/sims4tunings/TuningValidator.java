@@ -242,17 +242,12 @@ public class TuningValidator {
     }
 
     public static List<ITuningDescriptionElement> getChildrenOfTuningDescriptionElement(ITuningDescriptionElement parent) {
-        // TODO: add interface for container and check the interface instead
-        List<ITuningDescriptionElement> children =  switch (parent) {
-            case InstanceElement instanceElement -> instanceElement.getTunableElements();
-            case TunableList tunableList -> tunableList.getTunableElements();
-            case TunableVariant tunableVariant -> tunableVariant.getTunableElements();
-            case TunableTuple tunableTuple -> tunableTuple.getTunableElements();
-            case ClassElement classElement -> classElement.getTunableElements();
-            case ModuleElement moduleElement -> moduleElement.getTunableElements();
-            case TdescFrag tdescFrag -> tdescFrag.getTunableElements();
-            default -> List.of();
-        };
+        List<ITuningDescriptionElement> children;
+        if (parent instanceof IHasChildren parentWithChildren) {
+            children = parentWithChildren.getTunableElements();
+        } else {
+            children = List.of();
+        }
 
         // resolve "parent" attribute for inherited elements
         if (parent instanceof InstanceElement instanceElement) {
