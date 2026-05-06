@@ -74,9 +74,8 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
                 item.ifPresent(completionItems::add);
 
 
-                // we stop if the description had no default, i.e., was not optional
-                boolean hasDefault = childDescription instanceof IHasDefault || childDescription instanceof IHasOptionalDefault iHasOptionalDefault && iHasOptionalDefault.getDefaultValue().isPresent();
-                if (!hasDefault) {
+                // we stop if the description is not optional
+                if (!TuningValidator.isElementOptional(childDescription)) {
                     break;
                 }
             }

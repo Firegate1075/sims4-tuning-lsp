@@ -306,17 +306,10 @@ public class TuningValidator {
                 // always optional, because they always have a default value
                 return true;
             }
-            // assume all other elements are optional
-            default -> {return true;}
+            default -> {}
         }
 
-        // check if the element is a Tunable with allow_none="True"
-        if (descriptionElement instanceof Tunable tunable) {
-            Optional<Boolean> allowNone = tunable.getAllowNone();
-            if (allowNone.isPresent() && allowNone.get()) {
-                return true;
-            }
-        }
-
+        // assume all other elements are optional
+        return true;
     }
 }
