@@ -8,6 +8,7 @@ import org.eclipse.lsp4j.jsonrpc.json.adapters.JsonElementTypeAdapter;
  */
 public class RootSettings {
 
+    // contains the xml object of the sims4tunings settings
     @JsonAdapter(JsonElementTypeAdapter.Factory.class)
     private Object sims4tunings;
 

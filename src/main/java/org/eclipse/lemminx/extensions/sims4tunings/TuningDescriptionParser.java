@@ -19,9 +19,7 @@ public class TuningDescriptionParser {
     private static final String PROJECT_DIRECTORY = System.getProperty("user.dir");
     private static final Logger LOGGER = Logger.getLogger(TuningDescriptionParser.class.getName());
 
-    public static List<TuningRoot> parseTuningDescriptionXML() {
-        Path tdesc_path = Paths.get(PROJECT_DIRECTORY + "/tdesc");
-
+    public static List<TuningRoot> parseTuningDescriptionXML(Path tdesc_path) {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(TuningRoot.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();

@@ -1,6 +1,7 @@
 package org.eclipse.lemminx.extensions.sims4tunings;
 
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.TuningRoot;
+import org.eclipse.lemminx.extensions.sims4tunings.services.SettingsService;
 import org.eclipse.lemminx.services.extensions.IXMLExtension;
 import org.eclipse.lemminx.services.extensions.XMLExtensionsRegistry;
 import org.eclipse.lemminx.services.extensions.save.ISaveContext;
@@ -14,6 +15,7 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
     private TuningHashQuickFixProvider tuningHashQuickFixProvider;
     private TuningHashDiagnosticsProvider tuningHashDiagnosticsProvider;
     private TuningDescriptionCompletionProvider tuningDescriptionCompletionProvider;
+    private SettingsService settingsService;
 
     private final static Logger LOGGER = Logger.getLogger(Sims4TuningsLemminxExtension.class.getName());
 
@@ -22,7 +24,8 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
         // Called when settings or XML document are saved.
         if (context.getType() == ISaveContext.SaveContextType.SETTINGS) {
             // handle save of settings
-            updateSettings(context);
+            settingsService.updateSettings(context.getSettings());
+            LOGGER.info("Settings saved");
         }
     }
 
@@ -30,8 +33,10 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
     public void start(InitializeParams params, XMLExtensionsRegistry registry) {
         // Register here completion, hover, etc participants
 
+        settingsService = new SettingsService();
+
         // build tuning descriptions
-        List<TuningRoot> tuningRoots = TuningDescriptionParser.parseTuningDescriptionXML();
+        List<TuningRoot> tuningRoots = TuningDescriptionParser.parseTuningDescriptionXML(settingsService.getTdescPath());
         TuningDescriptionRegistry tuningDescriptionRegistry = TuningDescriptionRegistry.getInstance();
         tuningRoots.forEach(tuningDescriptionRegistry::addTuningDescription);
 

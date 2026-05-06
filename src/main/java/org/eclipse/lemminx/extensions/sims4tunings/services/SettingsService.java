@@ -17,7 +17,7 @@ public class SettingsService {
     private static final Logger LOGGER = Logger.getLogger(SettingsService.class.getName());
 
     private static final String PROJECT_DIRECTORY = System.getProperty("user.dir");
-    Path DEFAULT_TDESC_PATH = Paths.get(PROJECT_DIRECTORY + "/tdesc");
+    private static final Path DEFAULT_TDESC_PATH = Paths.get(PROJECT_DIRECTORY + "/tdesc");
 
     private Sims4TuningSettings settings;
 
