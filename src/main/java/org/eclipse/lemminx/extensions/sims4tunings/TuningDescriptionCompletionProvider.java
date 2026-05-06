@@ -1,5 +1,6 @@
 package org.eclipse.lemminx.extensions.sims4tunings;
 
+import org.eclipse.lemminx.dom.DOMNode;
 import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionDataModel.*;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionParticipant;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionRequest;
@@ -42,30 +43,43 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
         List<ITuningDescriptionElement> childrenDescriptions = TuningValidator.getChildrenOfTuningDescriptionElement(parentDescription);
         List<CompletionItem> completionItems = new ArrayList<>();
 
-        // tuples only suggest the next element in the tuple
-        // TODO: children with default values are optional and should be skippable -> suggest children up to next chld without a default
+        // we need to first find the description for the latest node in the XML document
+        // then, we can suggest all the descriptions until the next child without a default
         if (parentDescription instanceof TunableTuple tunableTuple) {
+
+            // we first need to find the corresponding description for the last node
+            int indexOfNode = TuningValidator.getIndexOfElementInList(request.getNode()).orElseThrow();
+
+            Optional<ITuningDescriptionElement> predecessorDescription = Optional.empty();
+            if (indexOfNode > 0) {
+                // we have a predecessor within the container element
+                int predecessorIndex = indexOfNode - 1;
+                DOMNode predecessor = request.getNode().getParentNode().getChild(predecessorIndex);
+                predecessorDescription = TuningValidator.getDescriptionOfNode(request.getXMLDocument(), predecessor);
+            }
+
+            // now we suggest all descriptions after the predecessor and up to the next one without a default
             for (ITuningDescriptionElement childDescription : tunableTuple.getTunableElements()) {
                 if (childDescription instanceof TdescFragTag tdescFragTag) {
                     childDescription = TuningValidator.getTdescFragTagContent(tdescFragTag);
-
-                    if (TuningValidator.isTunableNodeMatchingDescription(request.getNode(), childDescription)) {
-                        break;
-                    }
-
-                    if (childDescription instanceof IHasDefault || childDescription instanceof IHasOptionalDefault iHasOptionalDefault && iHasOptionalDefault.getDefaultValue().isPresent()) {
-                        Optional<CompletionItem> item = buildCompletionItemForElement(request, childDescription);
-                        item.ifPresent(completionItems::add);
-                        continue;
-                    }
-
-
                 }
 
+                // if there is a predecessor, skip until we find it
+                if (predecessorDescription.isPresent() && childDescription.equals(predecessorDescription.get())) {
+                    continue;
+                }
+
+                // add the elements
+                Optional<CompletionItem> item = buildCompletionItemForElement(request, childDescription);
+                item.ifPresent(completionItems::add);
+
+
+                // we stop if the description had no default, i.e., was not optional
+                boolean hasDefault = childDescription instanceof IHasDefault || childDescription instanceof IHasOptionalDefault iHasOptionalDefault && iHasOptionalDefault.getDefaultValue().isPresent();
+                if (!hasDefault) {
+                    break;
+                }
             }
-            Optional<Integer> indexOfNode = TuningValidator.getIndexOfElementInList(request.getNode());
-            Optional<CompletionItem> item = buildCompletionItemForElement(request, childrenDescriptions.get(indexOfNode.orElseThrow()));
-            item.ifPresent(completionItems::add);
         } else {
             // all other container elements suggest all their children
             for (ITuningDescriptionElement childDescription : childrenDescriptions) {
