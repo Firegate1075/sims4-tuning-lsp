@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @XmlRootElement(name = "TunableTuple")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TunableTuple implements ITuningDescriptionElement, IHasClass, IHasOptionalName, IHasOptionalDisplay, IHasOptionalDescription, ITunable {
+public class TunableTuple implements ITuningDescriptionElement, IHasClass, IHasOptionalName, IHasOptionalDisplay, IHasOptionalDescription, ITunable, IHasChildren {
     // mandatory attributes
 
     @XmlAttribute(name = "class")

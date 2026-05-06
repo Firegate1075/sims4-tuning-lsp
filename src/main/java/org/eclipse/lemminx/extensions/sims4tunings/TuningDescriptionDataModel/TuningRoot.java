@@ -7,7 +7,7 @@ import java.util.List;
 
 @XmlRootElement(name = "TuningRoot")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TuningRoot implements ITuningDescriptionElement {
+public class TuningRoot implements ITuningDescriptionElement, IHasChildren {
 
     // sub elements
 

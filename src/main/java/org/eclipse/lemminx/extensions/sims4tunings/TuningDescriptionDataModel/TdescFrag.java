@@ -7,7 +7,7 @@ import java.util.List;
 
 @XmlRootElement(name = "TdescFrag")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TdescFrag implements ITuningDescriptionElement {
+public class TdescFrag implements ITuningDescriptionElement, IHasChildren {
     // sub elements
 
     @XmlElements({
