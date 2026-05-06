@@ -261,4 +261,62 @@ public class TuningValidator {
 
         return children;
     }
+
+    public static boolean isElementOptional(ITuningDescriptionElement descriptionElement) {
+        // resolve TdescFragTags
+        if (descriptionElement instanceof TdescFragTag) {
+            return isElementOptional(getTdescFragTagContent((TdescFragTag) descriptionElement));
+        }
+
+        switch (descriptionElement) {
+            case Tunable tunable -> {
+                // check if the tunable has allow_none="True"
+                Optional<Boolean> allowNone = tunable.getAllowNone();
+                if (allowNone.isPresent() && allowNone.get()) {
+                    return true;
+                }
+                // otherwise: allow empty if it has a default value
+                return tunable.getDefaultValue().isPresent();
+            }
+            case TunableList tunableList -> {
+                return true;
+            }
+            case TunableTuple tunableTuple -> {
+                // optional if all children are optional
+                for (ITuningDescriptionElement child : tunableTuple.getTunableElements()) {
+                    if (!isElementOptional(child)) {
+                        return false;
+                    }
+                }
+            }
+            case TunableVariant tunableVariant -> {
+                // optional if the default variant is optional
+
+                // find the default variant's description
+                String defaultVariant = tunableVariant.getDefaultValue();
+                for (ITuningDescriptionElement child : tunableVariant.getTunableElements()) {
+                    if (getTuningDescriptionElementName(child).isPresent() && getTuningDescriptionElementName(child).get().equals(defaultVariant)) {
+                        return isElementOptional(child);
+                    }
+                }
+                // TODO: this is an error, maybe log or throw?
+                return false;
+            }
+            case TunableEnum tunableEnum -> {
+                // always optional, because they always have a default value
+                return true;
+            }
+            // assume all other elements are optional
+            default -> {return true;}
+        }
+
+        // check if the element is a Tunable with allow_none="True"
+        if (descriptionElement instanceof Tunable tunable) {
+            Optional<Boolean> allowNone = tunable.getAllowNone();
+            if (allowNone.isPresent() && allowNone.get()) {
+                return true;
+            }
+        }
+
+    }
 }
