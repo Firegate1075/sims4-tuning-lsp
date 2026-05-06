@@ -1,11 +1,11 @@
-package org.eclipse.lemminx.extensions.sims4tunings;
+package org.eclipse.lemminx.extensions.sims4tunings.services;
 
 // TODO: make vscode extension, that registers the settings in vscode
 
 /**
  * This class is used to store the settings of the extension.
  */
-public class ExtensionSettings {
+public class SettingsService {
 
     private String tuningDescriptionPath;
 
