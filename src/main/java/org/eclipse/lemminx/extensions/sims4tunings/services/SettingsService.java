@@ -26,13 +26,14 @@ public class SettingsService {
 
     /**
      * Updates the settings of the extension from the given XML settings object.
+     * Also notifies all the observers.
      * @param xmlSettings the XML settings object.
      */
     public void updateSettings(Object xmlSettings) {
         RootSettings rootSettings = JSONUtility.toModel(xmlSettings, RootSettings.class);
         if (rootSettings != null) {
             settings = JSONUtility.toModel(rootSettings.getSims4tunings(), Sims4TuningSettings.class);
-            observers.forEach(observer -> observer.onSettingsUpdate(settings));
+            observers.forEach(ISettingsObserver::onSettingsUpdate);
         }
     }
 
@@ -48,10 +49,18 @@ public class SettingsService {
         }
     }
 
+    /**
+     * Registers an observer for updates of settings.
+     * @param settingsObserver the observer to add.
+     */
     public void registerObserver(ISettingsObserver settingsObserver) {
         observers.add(settingsObserver);
     }
 
+    /**
+     * Unregisters a settings observer.
+     * @param settingsObserver the observer to remove.
+     */
     public void unregisterObserver(ISettingsObserver settingsObserver) {
         observers.remove(settingsObserver);
     }
