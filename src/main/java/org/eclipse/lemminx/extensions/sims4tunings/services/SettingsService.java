@@ -2,12 +2,14 @@ package org.eclipse.lemminx.extensions.sims4tunings.services;
 
 // TODO: make vscode extension, that registers the settings in vscode
 
+import org.eclipse.lemminx.extensions.sims4tunings.ISettingsObserver;
 import org.eclipse.lemminx.extensions.sims4tunings.models.SettingsModel.RootSettings;
 import org.eclipse.lemminx.extensions.sims4tunings.models.SettingsModel.Sims4TuningSettings;
 import org.eclipse.lemminx.utils.JSONUtility;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
@@ -20,6 +22,7 @@ public class SettingsService {
     private static final Path DEFAULT_TDESC_PATH = Paths.get(PROJECT_DIRECTORY + "/tdesc");
 
     private Sims4TuningSettings settings;
+    private final ArrayList<ISettingsObserver> observers = new ArrayList<>();
 
     /**
      * Updates the settings of the extension from the given XML settings object.
@@ -29,6 +32,7 @@ public class SettingsService {
         RootSettings rootSettings = JSONUtility.toModel(xmlSettings, RootSettings.class);
         if (rootSettings != null) {
             settings = JSONUtility.toModel(rootSettings.getSims4tunings(), Sims4TuningSettings.class);
+            observers.forEach(observer -> observer.onSettingsUpdate(settings));
         }
     }
 
@@ -42,5 +46,13 @@ public class SettingsService {
         } else {
             return DEFAULT_TDESC_PATH;
         }
+    }
+
+    public void registerObserver(ISettingsObserver settingsObserver) {
+        observers.add(settingsObserver);
+    }
+
+    public void unregisterObserver(ISettingsObserver settingsObserver) {
+        observers.remove(settingsObserver);
     }
 }
