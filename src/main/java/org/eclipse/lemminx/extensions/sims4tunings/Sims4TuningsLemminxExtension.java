@@ -1,5 +1,8 @@
 package org.eclipse.lemminx.extensions.sims4tunings;
 
+import org.eclipse.lemminx.extensions.sims4tunings.adapters.CompletionProviderAdapter;
+import org.eclipse.lemminx.extensions.sims4tunings.adapters.DiagnosticsProviderAdapter;
+import org.eclipse.lemminx.extensions.sims4tunings.adapters.QuickFixProviderAdapter;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.TuningRoot;
 import org.eclipse.lemminx.extensions.sims4tunings.services.SettingsService;
 import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;
@@ -12,10 +15,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class Sims4TuningsLemminxExtension implements IXMLExtension {
-    private RootElementCompletionProvider rootElementCompletionProvider;
-    private TuningHashQuickFixProvider tuningHashQuickFixProvider;
-    private TuningHashDiagnosticsProvider tuningHashDiagnosticsProvider;
-    private TuningDescriptionCompletionProvider tuningDescriptionCompletionProvider;
+    private CompletionProviderAdapter rootElementCompletionProviderAdapter;
+    private QuickFixProviderAdapter tuningHashQuickFixProviderAdapter;
+    private DiagnosticsProviderAdapter tuningHashDiagnosticsProviderAdapter;
+    private CompletionProviderAdapter tuningDescriptionCompletionProviderAdapter;
     private SettingsService settingsService;
 
     private final static Logger LOGGER = Logger.getLogger(Sims4TuningsLemminxExtension.class.getName());
@@ -38,14 +41,21 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
         TuningDescriptionRegistry tuningDescriptionRegistry = new TuningDescriptionRegistry();
         TuningDescriptionService tuningDescriptionService = new TuningDescriptionService(tuningDescriptionRegistry);
 
-        rootElementCompletionProvider = new RootElementCompletionProvider(tuningDescriptionService);
-        registry.registerCompletionParticipant(rootElementCompletionProvider);
-        tuningHashQuickFixProvider = new TuningHashQuickFixProvider();
-        registry.registerCodeActionParticipant(tuningHashQuickFixProvider);
-        tuningHashDiagnosticsProvider = new TuningHashDiagnosticsProvider();
-        registry.registerDiagnosticsParticipant(tuningHashDiagnosticsProvider);
-        tuningDescriptionCompletionProvider = new TuningDescriptionCompletionProvider(tuningDescriptionService);
-        registry.registerCompletionParticipant(tuningDescriptionCompletionProvider);
+        RootElementCompletionProvider rootElementCompletionProvider = new RootElementCompletionProvider(tuningDescriptionService);
+        rootElementCompletionProviderAdapter = new CompletionProviderAdapter(rootElementCompletionProvider, tuningDescriptionService);
+        registry.registerCompletionParticipant(rootElementCompletionProviderAdapter);
+
+        TuningHashQuickFixProvider tuningHashQuickFixProvider = new TuningHashQuickFixProvider();
+        tuningHashQuickFixProviderAdapter = new QuickFixProviderAdapter(tuningHashQuickFixProvider,  tuningDescriptionService);
+        registry.registerCodeActionParticipant(tuningHashQuickFixProviderAdapter);
+
+        TuningHashDiagnosticsProvider tuningHashDiagnosticsProvider = new TuningHashDiagnosticsProvider();
+        tuningHashDiagnosticsProviderAdapter = new DiagnosticsProviderAdapter(tuningHashDiagnosticsProvider, tuningDescriptionService);
+        registry.registerDiagnosticsParticipant(tuningHashDiagnosticsProviderAdapter);
+
+        TuningDescriptionCompletionProvider tuningDescriptionCompletionProvider = new TuningDescriptionCompletionProvider(tuningDescriptionService);
+        tuningDescriptionCompletionProviderAdapter = new CompletionProviderAdapter(tuningDescriptionCompletionProvider, tuningDescriptionService);
+        registry.registerCompletionParticipant(tuningDescriptionCompletionProviderAdapter);
 
         LOGGER.info("Sims4TuningsLemminxExtension initialized");
     }
@@ -53,13 +63,13 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
     @Override
     public void stop(XMLExtensionsRegistry registry) {
         // Unregister here completion, hover, etc. participants
-        registry.unregisterCompletionParticipant(rootElementCompletionProvider);
-        rootElementCompletionProvider = null;
-        registry.unregisterCodeActionParticipant(tuningHashQuickFixProvider);
-        tuningHashQuickFixProvider = null;
-        registry.unregisterDiagnosticsParticipant(tuningHashDiagnosticsProvider);
-        tuningHashDiagnosticsProvider = null;
-        registry.unregisterCompletionParticipant(tuningDescriptionCompletionProvider);
-        tuningDescriptionCompletionProvider = null;
+        registry.unregisterCompletionParticipant(rootElementCompletionProviderAdapter);
+        rootElementCompletionProviderAdapter = null;
+        registry.unregisterCodeActionParticipant(tuningHashQuickFixProviderAdapter);
+        tuningHashQuickFixProviderAdapter = null;
+        registry.unregisterDiagnosticsParticipant(tuningHashDiagnosticsProviderAdapter);
+        tuningHashDiagnosticsProviderAdapter = null;
+        registry.unregisterCompletionParticipant(tuningDescriptionCompletionProviderAdapter);
+        tuningDescriptionCompletionProviderAdapter = null;
     }
 }
