@@ -15,19 +15,12 @@ class TuningDescriptionRegistryTest {
     private static final String PROJECT_DIRECTORY = System.getProperty("user.dir");
     private static final Path DEFAULT_TDESC_PATH = Paths.get(PROJECT_DIRECTORY + "/tdesc");
 
-    @BeforeEach
-    public void setup() throws NoSuchFieldException, IllegalAccessException {
-        Field instance = TuningDescriptionRegistry.class.getDeclaredField("instance");
-        instance.setAccessible(true);
-        instance.set(null, null);
-    }
-
     @Test
     void addTuningDescription() {
         var parsedTuningDescriptions = TuningDescriptionParser.parseTuningDescriptionXML(DEFAULT_TDESC_PATH);
 
         assert(parsedTuningDescriptions.size() == 1764);
-        TuningDescriptionRegistry registry = TuningDescriptionRegistry.getInstance();
+        TuningDescriptionRegistry registry = new TuningDescriptionRegistry();
 
         // add all the tuning descriptions
         parsedTuningDescriptions.forEach(registry::addTuningDescription);
@@ -38,7 +31,7 @@ class TuningDescriptionRegistryTest {
         var parsedTuningDescriptions = TuningDescriptionParser.parseTuningDescriptionXML(DEFAULT_TDESC_PATH);
 
         assert(parsedTuningDescriptions.size() == 1764);
-        TuningDescriptionRegistry registry = TuningDescriptionRegistry.getInstance();
+        TuningDescriptionRegistry registry = new TuningDescriptionRegistry();
 
         // add all the tuning descriptions
         parsedTuningDescriptions.forEach(registry::addTuningDescription);
@@ -54,7 +47,7 @@ class TuningDescriptionRegistryTest {
         var parsedTuningDescriptions = TuningDescriptionParser.parseTuningDescriptionXML(DEFAULT_TDESC_PATH);
 
         assert(parsedTuningDescriptions.size() == 1764);
-        TuningDescriptionRegistry registry = TuningDescriptionRegistry.getInstance();
+        TuningDescriptionRegistry registry = new TuningDescriptionRegistry();
 
         parsedTuningDescriptions.forEach(registry::addTuningDescription);
         var r = registry.getClassElementByPath("statistics-statistic_conditions.HiddenOrShownCondition.Timing");
@@ -76,7 +69,7 @@ class TuningDescriptionRegistryTest {
         var parsedTuningDescriptions = TuningDescriptionParser.parseTuningDescriptionXML(DEFAULT_TDESC_PATH);
 
         assert(parsedTuningDescriptions.size() == 1764);
-        TuningDescriptionRegistry registry = TuningDescriptionRegistry.getInstance();
+        TuningDescriptionRegistry registry = new TuningDescriptionRegistry();
 
         // add all the tuning descriptions
         parsedTuningDescriptions.forEach(registry::addTuningDescription);

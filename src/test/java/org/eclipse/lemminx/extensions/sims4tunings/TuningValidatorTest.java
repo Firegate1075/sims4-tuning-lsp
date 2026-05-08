@@ -6,6 +6,8 @@ import org.eclipse.lemminx.dom.DOMNode;
 import org.eclipse.lemminx.dom.DOMParser;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.ITuningDescriptionElement;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.Tunable;
+import org.eclipse.lemminx.extensions.sims4tunings.services.SettingsService;
+import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;
 import org.eclipse.lemminx.services.XMLLanguageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,13 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class TuningValidatorTest {
     private static final String PROJECT_DIRECTORY = System.getProperty("user.dir");
     private static final Path DEFAULT_TDESC_PATH = Paths.get(PROJECT_DIRECTORY + "/tdesc");
-
-    @BeforeEach
-    public void setup() throws NoSuchFieldException, IllegalAccessException {
-        Field instance = TuningDescriptionRegistry.class.getDeclaredField("instance");
-        instance.setAccessible(true);
-        instance.set(null, null);
-    }
 
     private static final String TEST_DOCUMENT = """
 <?xml version="1.0" encoding="utf-8"?>
@@ -66,18 +61,23 @@ class TuningValidatorTest {
     void getDescriptionOfNode() {
         var parsedTuningDescriptions = TuningDescriptionParser.parseTuningDescriptionXML(DEFAULT_TDESC_PATH);
         assert(parsedTuningDescriptions.size() == 1764);
-        TuningDescriptionRegistry registry = TuningDescriptionRegistry.getInstance();
+        TuningDescriptionRegistry registry = new TuningDescriptionRegistry();
+        TuningDescriptionService tuningDescriptionService = new TuningDescriptionService(registry);
+
+        // update settings to use default path
+        SettingsService.getInstance().updateSettings(null);
+
         // add all the tuning descriptions
         parsedTuningDescriptions.forEach(registry::addTuningDescription);
 
         XMLLanguageService xmlLanguageService = new XMLLanguageService();
         TextDocument document = new TextDocument(TEST_DOCUMENT, "test://test/test.xml");
         DOMDocument domDocument = DOMParser.getInstance().parse(document, xmlLanguageService.getResolverExtensionManager());
-        Optional<ITuningDescriptionElement> description = TuningValidator.getDescriptionOfNode(domDocument, domDocument.getDocumentElement());
+        Optional<ITuningDescriptionElement> description = TuningValidator.getDescriptionOfNode(tuningDescriptionService, domDocument, domDocument.getDocumentElement());
         assertTrue(description.isPresent());
 
         DOMNode tunableNode = domDocument.getDocumentElement().getChild(2).getFirstChild().getFirstChild().getFirstChild().getFirstChild().getFirstChild().getFirstChild();
-        description = TuningValidator.getDescriptionOfNode(domDocument, tunableNode);
+        description = TuningValidator.getDescriptionOfNode(tuningDescriptionService, domDocument, tunableNode);
         assertTrue(description.isPresent());
         assert(((Tunable) description.get()).getType().get().equals("buff"));
     }
