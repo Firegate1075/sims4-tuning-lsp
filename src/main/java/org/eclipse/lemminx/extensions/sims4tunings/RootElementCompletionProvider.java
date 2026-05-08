@@ -3,6 +3,7 @@ package org.eclipse.lemminx.extensions.sims4tunings;
 import org.eclipse.lemminx.dom.DOMAttr;
 import org.eclipse.lemminx.dom.DOMNode;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.InstanceElement;
+import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;
 import org.eclipse.lemminx.services.extensions.completion.CompletionParticipantAdapter;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionRequest;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionResponse;
@@ -18,10 +19,10 @@ public class RootElementCompletionProvider extends CompletionParticipantAdapter 
 
     private final static Logger LOGGER = Logger.getLogger(RootElementCompletionProvider.class.getName());
 
-    private final TuningDescriptionRegistry registry;
+    private final TuningDescriptionService tuningDescriptionService;
 
-    public RootElementCompletionProvider(TuningDescriptionRegistry registry) {
-        this.registry = registry;
+    public RootElementCompletionProvider(TuningDescriptionService tuningDescriptionService) {
+        this.tuningDescriptionService = tuningDescriptionService;
     }
 
     @Override
@@ -52,9 +53,9 @@ public class RootElementCompletionProvider extends CompletionParticipantAdapter 
     public void onAttributeValue(String valuePrefix, ICompletionRequest request, ICompletionResponse response, CancelChecker cancelChecker) throws Exception {
         if (request.getCurrentTag().equals("I") && request.getCurrentAttributeName().equals("c")) {
             LOGGER.info("Class name attribute completion requested");
-            List<String> classNames = registry.getClassNamesOfInstanceElementEntries();
+            List<String> classNames = tuningDescriptionService.getClassNamesOfInstanceElementEntries();
             for (String className : classNames) {
-                InstanceElement element = registry.getInstanceElementByClassName(className).orElseThrow();
+                InstanceElement element = tuningDescriptionService.getInstanceElementByClassName(className).orElseThrow();
 
                 // build completion item
                 CompletionItem completionItem = new CompletionItem(className);

@@ -3,12 +3,13 @@ package org.eclipse.lemminx.extensions.sims4tunings;
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.dom.DOMNode;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.*;
+import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;
 
 import java.util.*;
 import java.util.stream.Stream;
 
 public class TuningValidator {
-    public static Optional<ITuningDescriptionElement> getDescriptionOfNode(DOMDocument document, DOMNode node) {
+    public static Optional<ITuningDescriptionElement> getDescriptionOfNode(TuningDescriptionService tuningDescriptionService, DOMDocument document, DOMNode node) {
         // TODO: does not check order of tunable tuples!
 
         if (node.getNodeType() != DOMNode.ELEMENT_NODE) {
@@ -20,7 +21,6 @@ public class TuningValidator {
 
         Deque<DOMNode> nodeSequence = new ArrayDeque<>();
         Deque<ITuningDescriptionElement> tuningDescriptionSequence = new ArrayDeque<>();
-        TuningDescriptionRegistry registry = TuningDescriptionRegistry.getInstance();
 
         // while we have not found our node
         //while (!currentNode.isEqualNode(node)) {
@@ -35,8 +35,8 @@ public class TuningValidator {
         // handle root separately
         DOMNode rootNode = document.getDocumentElement();
         Optional<? extends ITuningDescriptionElement> rootDescription = switch (rootNode.getNodeName()) {
-            case "I" -> registry.getInstanceElementByClassName(rootNode.getAttribute("c"));
-            case "M" -> registry.getModuleElementByName(rootNode.getAttribute("n"));
+            case "I" -> tuningDescriptionService.getInstanceElementByClassName(rootNode.getAttribute("c"));
+            case "M" -> tuningDescriptionService.getModuleElementByName(rootNode.getAttribute("n"));
             default -> Optional.empty();
         };
 
@@ -47,15 +47,15 @@ public class TuningValidator {
         tuningDescriptionSequence.add(rootDescription.get());
 
         for (DOMNode nodeInSequence : nodeSequence) {
-            Optional<ITuningDescriptionElement> foundMatchingDescription = getChildrenOfTuningDescriptionElement(tuningDescriptionSequence.peekLast()).stream()
-                    .filter(child -> isTunableNodeMatchingDescription(nodeInSequence, child))
+            Optional<ITuningDescriptionElement> foundMatchingDescription = getChildrenOfTuningDescriptionElement(tuningDescriptionService, tuningDescriptionSequence.peekLast()).stream()
+                    .filter(child -> isTunableNodeMatchingDescription(tuningDescriptionService, nodeInSequence, child))
                     .findFirst();
             if (foundMatchingDescription.isPresent()) {
                 tuningDescriptionSequence.addLast(foundMatchingDescription.get());
 
                 // if it was a TdescFrag, also add the content element
                 if (foundMatchingDescription.get() instanceof TdescFragTag tdescFragTag) {
-                    ITuningDescriptionElement tdescFragContent = getTdescFragTagContent(tdescFragTag);
+                    ITuningDescriptionElement tdescFragContent = getTdescFragTagContent(tuningDescriptionService, tdescFragTag);
                     tuningDescriptionSequence.addLast(tdescFragContent);
                 }
             } else {
@@ -64,7 +64,7 @@ public class TuningValidator {
         }
 
         ITuningDescriptionElement candidate = tuningDescriptionSequence.removeLast();
-        if (isTunableNodeMatchingDescription(node, candidate)) {
+        if (isTunableNodeMatchingDescription(tuningDescriptionService, node, candidate)) {
             // we have a final match
             return Optional.of(candidate);
         }
@@ -72,14 +72,14 @@ public class TuningValidator {
         return Optional.empty();
     }
 
-    public static boolean isTunableNodeMatchingDescription(DOMNode node, ITuningDescriptionElement description) {
+    public static boolean isTunableNodeMatchingDescription(TuningDescriptionService tuningDescriptionService, DOMNode node, ITuningDescriptionElement description) {
         if (node.getNodeType() != DOMNode.ELEMENT_NODE) {
             return false;
         }
 
         // check for TdescFragTag
         if (description instanceof TdescFragTag tdescFragTag) {
-            return isTunableNodeMatchingDescription(node, getTdescFragTagContent(tdescFragTag));
+            return isTunableNodeMatchingDescription(tuningDescriptionService, node, getTdescFragTagContent(tuningDescriptionService, tdescFragTag));
         }
 
         boolean isCorrectType = switch (node.getNodeName()) {
@@ -115,7 +115,7 @@ public class TuningValidator {
 
         if (description instanceof TunableVariant) {
             // check if one of the children has a name attribute that matches the variant type
-            variantTypeValid = getChildrenOfTuningDescriptionElement(description).stream().anyMatch(
+            variantTypeValid = getChildrenOfTuningDescriptionElement(tuningDescriptionService, description).stream().anyMatch(
                     child -> getTuningDescriptionElementName(child).isPresent() && getTuningDescriptionElementName(child).get().equals(node.getAttribute("t")));
         } else if (node.getParentNode().getNodeName().equals("V")) {
             //check that the name actually matches the parent-variant's type
@@ -125,9 +125,9 @@ public class TuningValidator {
         return isCorrectType && hasCorrectName && variantTypeValid;
     }
 
-    public static ITuningDescriptionElement getTdescFragTagContent(TdescFragTag tdescFragTag) {
+    public static ITuningDescriptionElement getTdescFragTagContent(TuningDescriptionService tuningDescriptionService, TdescFragTag tdescFragTag) {
         String className = tdescFragTag.getClassName();
-        TdescFrag tdescFrag = TuningDescriptionRegistry.getInstance().getTdescFragByClassName(className).orElseThrow();
+        TdescFrag tdescFrag = tuningDescriptionService.getTdescFragByClassName(className).orElseThrow();
         ITuningDescriptionElement tdescFragContent = tdescFrag.getTunableElements().getFirst();;
 
         // set tdescFragContent's name attribute to that of the tag
@@ -237,7 +237,7 @@ public class TuningValidator {
         return Optional.of(index);
     }
 
-    public static List<ITuningDescriptionElement> getChildrenOfTuningDescriptionElement(ITuningDescriptionElement parent) {
+    public static List<ITuningDescriptionElement> getChildrenOfTuningDescriptionElement(TuningDescriptionService tuningDescriptionService, ITuningDescriptionElement parent) {
         List<ITuningDescriptionElement> children = new ArrayList<>();
         if (parent instanceof IHasChildren parentWithChildren) {
             children = parentWithChildren.getTunableElements();
@@ -247,19 +247,19 @@ public class TuningValidator {
         if (parent instanceof InstanceElement instanceElement) {
             if (instanceElement.getParents().isPresent()) {
                 String parentClassName = instanceElement.getParents().get().split(",")[0];
-                Optional<InstanceElement> parentInstance = TuningDescriptionRegistry.getInstance().getInstanceElementByClassName(parentClassName);
+                Optional<InstanceElement> parentInstance = tuningDescriptionService.getInstanceElementByClassName(parentClassName);
 
-                return Stream.concat(children.stream(), getChildrenOfTuningDescriptionElement(parentInstance.orElseThrow()).stream()).toList();
+                return Stream.concat(children.stream(), getChildrenOfTuningDescriptionElement(tuningDescriptionService, parentInstance.orElseThrow()).stream()).toList();
             }
         }
 
         return children;
     }
 
-    public static boolean isElementOptional(ITuningDescriptionElement descriptionElement) {
+    public static boolean isElementOptional(TuningDescriptionService tuningDescriptionService, ITuningDescriptionElement descriptionElement) {
         // resolve TdescFragTags
         if (descriptionElement instanceof TdescFragTag) {
-            return isElementOptional(getTdescFragTagContent((TdescFragTag) descriptionElement));
+            return isElementOptional(tuningDescriptionService, getTdescFragTagContent(tuningDescriptionService, (TdescFragTag) descriptionElement));
         }
 
         switch (descriptionElement) {
@@ -278,7 +278,7 @@ public class TuningValidator {
             case TunableTuple tunableTuple -> {
                 // optional if all children are optional
                 for (ITuningDescriptionElement child : tunableTuple.getTunableElements()) {
-                    if (!isElementOptional(child)) {
+                    if (!isElementOptional(tuningDescriptionService, child)) {
                         return false;
                     }
                 }
@@ -290,7 +290,7 @@ public class TuningValidator {
                 String defaultVariant = tunableVariant.getDefaultValue();
                 for (ITuningDescriptionElement child : tunableVariant.getTunableElements()) {
                     if (getTuningDescriptionElementName(child).isPresent() && getTuningDescriptionElementName(child).get().equals(defaultVariant)) {
-                        return isElementOptional(child);
+                        return isElementOptional(tuningDescriptionService, child);
                     }
                 }
                 // TODO: this is an error, maybe log or throw?

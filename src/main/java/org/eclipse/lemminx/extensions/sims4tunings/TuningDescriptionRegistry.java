@@ -16,22 +16,14 @@ public class TuningDescriptionRegistry {
 
     // map that stores tuning descriptions of <TdescFrag> elements by className
     private final Map<String, TdescFrag> tdescFragTuningDescriptionMap = HashMap.newHashMap(8);
-    private static TuningDescriptionRegistry instance;
 
-    private TuningDescriptionRegistry() { }
-
-    public static TuningDescriptionRegistry getInstance() {
-        if (instance == null) {
-            synchronized (TuningDescriptionRegistry.class) {
-                instance = new TuningDescriptionRegistry();
-            }
-        }
-        return instance;
+    public void clear() {
+        moduleElementsTuningDescriptionMap.clear();
+        instanceElementTuningDescriptionMap.clear();
+        tdescFragTuningDescriptionMap.clear();
     }
 
     public void addTuningDescription(TuningRoot root) {
-        String className = "";
-
         ITuningDescriptionElement element = root.getTunableElements().getFirst();
 
         if (element instanceof InstanceElement instanceElement) {

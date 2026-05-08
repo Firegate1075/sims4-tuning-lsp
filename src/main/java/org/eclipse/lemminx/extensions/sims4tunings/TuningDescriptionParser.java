@@ -14,7 +14,9 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 
-public class TuningDescriptionParser {
+public final class TuningDescriptionParser {
+
+    private TuningDescriptionParser() {}
 
     private static final String PROJECT_DIRECTORY = System.getProperty("user.dir");
     private static final Logger LOGGER = Logger.getLogger(TuningDescriptionParser.class.getName());
