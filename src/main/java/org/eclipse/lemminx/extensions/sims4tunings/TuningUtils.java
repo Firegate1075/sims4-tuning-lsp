@@ -8,7 +8,7 @@ import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionSer
 import java.util.*;
 import java.util.stream.Stream;
 
-public class TuningValidator {
+public class TuningUtils {
     public static Optional<ITuningDescriptionElement> getDescriptionOfNode(DOMDocument document, DOMNode node) {
         // TODO: does not check order of tunable tuples!
 
