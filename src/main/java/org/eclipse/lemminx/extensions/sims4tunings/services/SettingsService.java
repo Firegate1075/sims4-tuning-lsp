@@ -2,7 +2,6 @@ package org.eclipse.lemminx.extensions.sims4tunings.services;
 
 // TODO: make vscode extension, that registers the settings in vscode
 
-import org.eclipse.lemminx.extensions.sims4tunings.ISettingsObserver;
 import org.eclipse.lemminx.extensions.sims4tunings.models.SettingsModel.RootSettings;
 import org.eclipse.lemminx.extensions.sims4tunings.models.SettingsModel.Sims4TuningSettings;
 import org.eclipse.lemminx.utils.JSONUtility;

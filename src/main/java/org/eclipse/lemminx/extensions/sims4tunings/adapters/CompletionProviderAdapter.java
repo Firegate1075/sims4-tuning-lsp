@@ -1,6 +1,6 @@
 package org.eclipse.lemminx.extensions.sims4tunings.adapters;
 
-import org.eclipse.lemminx.extensions.sims4tunings.ITuningDescriptionObserver;
+import org.eclipse.lemminx.extensions.sims4tunings.services.ITuningDescriptionObserver;
 import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionParticipant;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionRequest;

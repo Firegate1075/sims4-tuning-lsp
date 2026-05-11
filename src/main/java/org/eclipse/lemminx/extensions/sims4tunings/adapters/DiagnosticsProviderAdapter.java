@@ -2,9 +2,8 @@ package org.eclipse.lemminx.extensions.sims4tunings.adapters;
 
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.extensions.contentmodel.settings.XMLValidationSettings;
-import org.eclipse.lemminx.extensions.sims4tunings.ITuningDescriptionObserver;
+import org.eclipse.lemminx.extensions.sims4tunings.services.ITuningDescriptionObserver;
 import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;
-import org.eclipse.lemminx.services.extensions.completion.ICompletionParticipant;
 import org.eclipse.lemminx.services.extensions.diagnostics.IDiagnosticsParticipant;
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.jsonrpc.CancelChecker;

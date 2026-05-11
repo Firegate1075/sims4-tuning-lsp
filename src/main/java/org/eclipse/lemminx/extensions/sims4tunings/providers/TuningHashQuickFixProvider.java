@@ -2,7 +2,7 @@ package org.eclipse.lemminx.extensions.sims4tunings.providers;
 
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.dom.DOMNode;
-import org.eclipse.lemminx.extensions.sims4tunings.Hashing;
+import org.eclipse.lemminx.extensions.sims4tunings.util.Hashing;
 import org.eclipse.lemminx.services.extensions.codeaction.ICodeActionParticipant;
 import org.eclipse.lemminx.services.extensions.codeaction.ICodeActionRequest;
 import org.eclipse.lemminx.utils.TextEditUtils;

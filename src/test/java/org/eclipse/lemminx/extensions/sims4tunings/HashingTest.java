@@ -1,8 +1,7 @@
 package org.eclipse.lemminx.extensions.sims4tunings;
 
+import org.eclipse.lemminx.extensions.sims4tunings.util.Hashing;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 

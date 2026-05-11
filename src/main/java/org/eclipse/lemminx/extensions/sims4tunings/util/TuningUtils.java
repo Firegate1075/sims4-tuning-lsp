@@ -1,4 +1,4 @@
-package org.eclipse.lemminx.extensions.sims4tunings;
+package org.eclipse.lemminx.extensions.sims4tunings.util;
 
 import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.dom.DOMNode;

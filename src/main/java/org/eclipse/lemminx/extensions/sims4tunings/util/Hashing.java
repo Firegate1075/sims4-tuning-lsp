@@ -1,4 +1,4 @@
-package org.eclipse.lemminx.extensions.sims4tunings;
+package org.eclipse.lemminx.extensions.sims4tunings.util;
 
 public class Hashing {
     private static final long FNV_OFFSET_BASIS = 0xcbf29ce484222325L;

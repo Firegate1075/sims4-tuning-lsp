@@ -1,4 +1,4 @@
-package org.eclipse.lemminx.extensions.sims4tunings;
+package org.eclipse.lemminx.extensions.sims4tunings.util;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -8,7 +8,6 @@ import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataM
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Stream;

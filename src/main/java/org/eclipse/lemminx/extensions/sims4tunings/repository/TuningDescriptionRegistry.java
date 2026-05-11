@@ -1,4 +1,4 @@
-package org.eclipse.lemminx.extensions.sims4tunings;
+package org.eclipse.lemminx.extensions.sims4tunings.repository;
 
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.*;
 

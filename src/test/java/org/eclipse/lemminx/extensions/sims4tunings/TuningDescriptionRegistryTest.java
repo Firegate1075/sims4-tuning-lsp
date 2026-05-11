@@ -3,10 +3,10 @@ package org.eclipse.lemminx.extensions.sims4tunings;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.InstanceElement;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.TdescFrag;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.TunableList;
-import org.junit.jupiter.api.BeforeEach;
+import org.eclipse.lemminx.extensions.sims4tunings.repository.TuningDescriptionRegistry;
+import org.eclipse.lemminx.extensions.sims4tunings.util.TuningDescriptionParser;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;

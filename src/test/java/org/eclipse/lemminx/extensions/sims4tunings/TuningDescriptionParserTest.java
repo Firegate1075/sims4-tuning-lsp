@@ -1,5 +1,7 @@
 package org.eclipse.lemminx.extensions.sims4tunings;
 
+import org.eclipse.lemminx.extensions.sims4tunings.repository.TuningDescriptionRegistry;
+import org.eclipse.lemminx.extensions.sims4tunings.util.TuningDescriptionParser;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 

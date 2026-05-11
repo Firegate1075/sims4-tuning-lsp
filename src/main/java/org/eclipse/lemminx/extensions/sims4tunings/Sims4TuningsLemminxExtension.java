@@ -7,6 +7,7 @@ import org.eclipse.lemminx.extensions.sims4tunings.providers.RootElementCompleti
 import org.eclipse.lemminx.extensions.sims4tunings.providers.TuningDescriptionCompletionProvider;
 import org.eclipse.lemminx.extensions.sims4tunings.providers.TuningHashDiagnosticsProvider;
 import org.eclipse.lemminx.extensions.sims4tunings.providers.TuningHashQuickFixProvider;
+import org.eclipse.lemminx.extensions.sims4tunings.repository.TuningDescriptionRegistry;
 import org.eclipse.lemminx.extensions.sims4tunings.services.SettingsService;
 import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;
 import org.eclipse.lemminx.services.extensions.IXMLExtension;

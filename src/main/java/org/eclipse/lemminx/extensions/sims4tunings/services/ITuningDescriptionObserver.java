@@ -1,4 +1,4 @@
-package org.eclipse.lemminx.extensions.sims4tunings;
+package org.eclipse.lemminx.extensions.sims4tunings.services;
 
 public interface ITuningDescriptionObserver
 {

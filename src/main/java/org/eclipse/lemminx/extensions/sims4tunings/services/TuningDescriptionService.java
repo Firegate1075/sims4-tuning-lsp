@@ -1,9 +1,7 @@
 package org.eclipse.lemminx.extensions.sims4tunings.services;
 
-import org.eclipse.lemminx.extensions.sims4tunings.ISettingsObserver;
-import org.eclipse.lemminx.extensions.sims4tunings.ITuningDescriptionObserver;
-import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionParser;
-import org.eclipse.lemminx.extensions.sims4tunings.TuningDescriptionRegistry;
+import org.eclipse.lemminx.extensions.sims4tunings.util.TuningDescriptionParser;
+import org.eclipse.lemminx.extensions.sims4tunings.repository.TuningDescriptionRegistry;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.*;
 
 import java.nio.file.Path;

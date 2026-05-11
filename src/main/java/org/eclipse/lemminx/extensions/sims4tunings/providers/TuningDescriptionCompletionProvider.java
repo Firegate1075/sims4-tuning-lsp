@@ -1,7 +1,7 @@
 package org.eclipse.lemminx.extensions.sims4tunings.providers;
 
 import org.eclipse.lemminx.dom.DOMNode;
-import org.eclipse.lemminx.extensions.sims4tunings.TuningUtils;
+import org.eclipse.lemminx.extensions.sims4tunings.util.TuningUtils;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.*;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionParticipant;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionRequest;

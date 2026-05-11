@@ -1,11 +1,10 @@
 package org.eclipse.lemminx.extensions.sims4tunings.adapters;
 
-import org.eclipse.lemminx.extensions.sims4tunings.ITuningDescriptionObserver;
+import org.eclipse.lemminx.extensions.sims4tunings.services.ITuningDescriptionObserver;
 import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;
 import org.eclipse.lemminx.services.extensions.codeaction.ICodeActionParticipant;
 import org.eclipse.lemminx.services.extensions.codeaction.ICodeActionRequest;
 import org.eclipse.lemminx.services.extensions.codeaction.ICodeActionResolvesParticipant;
-import org.eclipse.lemminx.services.extensions.diagnostics.IDiagnosticsParticipant;
 import org.eclipse.lsp4j.CodeAction;
 import org.eclipse.lsp4j.jsonrpc.CancelChecker;
 

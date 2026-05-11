@@ -6,8 +6,11 @@ import org.eclipse.lemminx.dom.DOMNode;
 import org.eclipse.lemminx.dom.DOMParser;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.ITuningDescriptionElement;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.Tunable;
+import org.eclipse.lemminx.extensions.sims4tunings.repository.TuningDescriptionRegistry;
 import org.eclipse.lemminx.extensions.sims4tunings.services.SettingsService;
 import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;
+import org.eclipse.lemminx.extensions.sims4tunings.util.TuningDescriptionParser;
+import org.eclipse.lemminx.extensions.sims4tunings.util.TuningUtils;
 import org.eclipse.lemminx.services.XMLLanguageService;
 import org.junit.jupiter.api.Test;
 
