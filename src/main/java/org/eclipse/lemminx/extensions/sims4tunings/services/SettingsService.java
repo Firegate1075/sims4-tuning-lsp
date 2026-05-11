@@ -52,8 +52,8 @@ public class SettingsService {
         if (rootSettings != null) {
             LOGGER.info("updating sims4tuning settings");
             settings = JSONUtility.toModel(rootSettings.getSims4tunings(), Sims4TuningSettings.class);
-            observers.forEach(ISettingsObserver::onSettingsUpdate);
         }
+        observers.forEach(ISettingsObserver::onSettingsUpdate);
     }
 
     /**

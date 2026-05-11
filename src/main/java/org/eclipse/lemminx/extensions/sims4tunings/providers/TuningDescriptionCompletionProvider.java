@@ -159,12 +159,13 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
     @Override
     public void onAttributeValue(String s, ICompletionRequest iCompletionRequest, ICompletionResponse iCompletionResponse, CancelChecker cancelChecker) throws Exception {
         LOGGER.info("Attribute value completion requested for attribute " + iCompletionRequest.getCurrentAttributeName() + " of element " + iCompletionRequest.getCurrentTag());
-        Optional<ITuningDescriptionElement> parentDescription = TuningValidator.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getNode());
-        if (parentDescription.isEmpty()) {
+        Optional<ITuningDescriptionElement> elementDescription = TuningValidator.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getNode());
+        LOGGER.info("Element description: " + elementDescription);
+        if (elementDescription.isEmpty()) {
             return;
         }
 
-        List<CompletionItem> completionItems = getCompletionItemsForChildren(iCompletionRequest, parentDescription.get());
+        List<CompletionItem> completionItems = getCompletionItemsForChildren(iCompletionRequest, elementDescription.get());
         for (CompletionItem completionItem : completionItems) {
             iCompletionResponse.addCompletionItem(completionItem);
         }
