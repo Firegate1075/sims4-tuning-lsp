@@ -19,12 +19,6 @@ public class RootElementCompletionProvider extends CompletionParticipantAdapter 
 
     private final static Logger LOGGER = Logger.getLogger(RootElementCompletionProvider.class.getName());
 
-    private final TuningDescriptionService tuningDescriptionService;
-
-    public RootElementCompletionProvider(TuningDescriptionService tuningDescriptionService) {
-        this.tuningDescriptionService = tuningDescriptionService;
-    }
-
     @Override
     public void onTagOpen(ICompletionRequest completionRequest, ICompletionResponse completionResponse, CancelChecker cancelChecker) throws Exception {
         if (completionRequest.getParentElement() == null) {
@@ -53,9 +47,9 @@ public class RootElementCompletionProvider extends CompletionParticipantAdapter 
     public void onAttributeValue(String valuePrefix, ICompletionRequest request, ICompletionResponse response, CancelChecker cancelChecker) throws Exception {
         if (request.getCurrentTag().equals("I") && request.getCurrentAttributeName().equals("c")) {
             LOGGER.info("Class name attribute completion requested");
-            List<String> classNames = tuningDescriptionService.getClassNamesOfInstanceElementEntries();
+            List<String> classNames = TuningDescriptionService.getSingletonInstance().getClassNamesOfInstanceElementEntries();
             for (String className : classNames) {
-                InstanceElement element = tuningDescriptionService.getInstanceElementByClassName(className).orElseThrow();
+                InstanceElement element = TuningDescriptionService.getSingletonInstance().getInstanceElementByClassName(className).orElseThrow();
 
                 // build completion item
                 CompletionItem completionItem = new CompletionItem(className);

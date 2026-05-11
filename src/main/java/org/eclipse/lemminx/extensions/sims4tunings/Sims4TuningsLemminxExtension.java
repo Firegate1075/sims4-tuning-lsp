@@ -28,35 +28,36 @@ public class Sims4TuningsLemminxExtension implements IXMLExtension {
     @Override
     public void doSave(ISaveContext context) {
         // Called when settings or XML document are saved.
+        LOGGER.info("Saving " + context.getType());
         if (context.getType() == ISaveContext.SaveContextType.SETTINGS) {
             // handle save of settings
-            SettingsService.getInstance().updateSettings(context.getSettings());
+            SettingsService.getSingletonInstance().updateSettings(context.getSettings());
             LOGGER.info("Settings saved");
         }
     }
 
     @Override
     public void start(InitializeParams params, XMLExtensionsRegistry registry) {
+
+        TuningDescriptionRegistry tuningDescriptionRegistry = new TuningDescriptionRegistry();
+        TuningDescriptionService.createSingletonInstance(tuningDescriptionRegistry);
+
         // Register here completion, hover, etc participants
 
-        // build tuning descriptions
-        TuningDescriptionRegistry tuningDescriptionRegistry = new TuningDescriptionRegistry();
-        TuningDescriptionService tuningDescriptionService = new TuningDescriptionService(tuningDescriptionRegistry);
-
-        RootElementCompletionProvider rootElementCompletionProvider = new RootElementCompletionProvider(tuningDescriptionService);
-        rootElementCompletionProviderAdapter = new CompletionProviderAdapter(rootElementCompletionProvider, tuningDescriptionService);
+        RootElementCompletionProvider rootElementCompletionProvider = new RootElementCompletionProvider();
+        rootElementCompletionProviderAdapter = new CompletionProviderAdapter(rootElementCompletionProvider);
         registry.registerCompletionParticipant(rootElementCompletionProviderAdapter);
 
         TuningHashQuickFixProvider tuningHashQuickFixProvider = new TuningHashQuickFixProvider();
-        tuningHashQuickFixProviderAdapter = new QuickFixProviderAdapter(tuningHashQuickFixProvider,  tuningDescriptionService);
+        tuningHashQuickFixProviderAdapter = new QuickFixProviderAdapter(tuningHashQuickFixProvider);
         registry.registerCodeActionParticipant(tuningHashQuickFixProviderAdapter);
 
         TuningHashDiagnosticsProvider tuningHashDiagnosticsProvider = new TuningHashDiagnosticsProvider();
-        tuningHashDiagnosticsProviderAdapter = new DiagnosticsProviderAdapter(tuningHashDiagnosticsProvider, tuningDescriptionService);
+        tuningHashDiagnosticsProviderAdapter = new DiagnosticsProviderAdapter(tuningHashDiagnosticsProvider);
         registry.registerDiagnosticsParticipant(tuningHashDiagnosticsProviderAdapter);
 
-        TuningDescriptionCompletionProvider tuningDescriptionCompletionProvider = new TuningDescriptionCompletionProvider(tuningDescriptionService);
-        tuningDescriptionCompletionProviderAdapter = new CompletionProviderAdapter(tuningDescriptionCompletionProvider, tuningDescriptionService);
+        TuningDescriptionCompletionProvider tuningDescriptionCompletionProvider = new TuningDescriptionCompletionProvider();
+        tuningDescriptionCompletionProviderAdapter = new CompletionProviderAdapter(tuningDescriptionCompletionProvider);
         registry.registerCompletionParticipant(tuningDescriptionCompletionProviderAdapter);
 
         LOGGER.info("Sims4TuningsLemminxExtension initialized");

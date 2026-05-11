@@ -9,12 +9,10 @@ import org.eclipse.lsp4j.jsonrpc.CancelChecker;
 
 public class CompletionProviderAdapter implements ICompletionParticipant, ITuningDescriptionObserver {
     private boolean isActive = false;
-    private TuningDescriptionService tuningDescriptionService;
-    private ICompletionParticipant completionProvider;
+    private final ICompletionParticipant completionProvider;
 
-    public CompletionProviderAdapter(ICompletionParticipant completionProvider, TuningDescriptionService tuningDescriptionService) {
-        tuningDescriptionService.registerObserver(this);
-        this.tuningDescriptionService = tuningDescriptionService;
+    public CompletionProviderAdapter(ICompletionParticipant completionProvider) {
+        TuningDescriptionService.getSingletonInstance().registerObserver(this);
         this.completionProvider = completionProvider;
     }
 
@@ -55,7 +53,7 @@ public class CompletionProviderAdapter implements ICompletionParticipant, ITunin
 
     @Override
     public void onTuningDescriptionInitialized() {
-        if (tuningDescriptionService.isInitialized()) {
+        if (TuningDescriptionService.getSingletonInstance().isInitialized()) {
             isActive = true;
         }
     }

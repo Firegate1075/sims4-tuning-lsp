@@ -14,20 +14,46 @@ import java.util.logging.Logger;
 public class TuningDescriptionService implements ISettingsObserver {
     private static final Logger LOGGER = Logger.getLogger(TuningDescriptionService.class.getName());
 
-    private final TuningDescriptionRegistry tdesc_registry;
+    private TuningDescriptionRegistry tdesc_registry;
     private boolean isInitialized = false;
     private Path tdescPath;
 
     private final ArrayList<ITuningDescriptionObserver> observers =  new ArrayList<>();
 
-    public TuningDescriptionService(TuningDescriptionRegistry registry) {
-        tdesc_registry = registry;
-        SettingsService.getInstance().registerObserver(this);
+    private static TuningDescriptionService instance;
+
+    private TuningDescriptionService(TuningDescriptionRegistry tdesc_registry) {
+        this.tdesc_registry = tdesc_registry;
+        SettingsService.getSingletonInstance().registerObserver(this);
     }
+
+    public static TuningDescriptionService createSingletonInstance(TuningDescriptionRegistry tdesc_registry) throws IllegalStateException {
+        if (instance == null) {
+            synchronized (TuningDescriptionService.class) {
+                instance = new TuningDescriptionService(tdesc_registry);
+                return instance;
+            }
+        } else {
+            throw new IllegalStateException("TuningDescriptionService is already initialized.");
+        }
+    }
+
+    /**
+     * Get the singleton instance of the service.
+     * @return the instance of the TuningDescriptionService.
+     */
+    public static TuningDescriptionService getSingletonInstance() throws IllegalStateException {
+        if (instance == null) {
+            throw new IllegalStateException("TuningDescriptionService is not initialized.");
+        }
+        return instance;
+    }
+
+
 
     private void readTuningDescriptions() {
         try {
-            List<TuningRoot> tuningRoots = TuningDescriptionParser.parseTuningDescriptionXML(SettingsService.getInstance().getTdescPath());
+            List<TuningRoot> tuningRoots = TuningDescriptionParser.parseTuningDescriptionXML(SettingsService.getSingletonInstance().getTdescPath());
 
             // if successful, update the registry
             tdesc_registry.clear();
@@ -36,13 +62,13 @@ public class TuningDescriptionService implements ISettingsObserver {
             isInitialized = true;
             observers.forEach(ITuningDescriptionObserver::onTuningDescriptionInitialized);
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error reading Tuning Descriptions from the specified path: " + SettingsService.getInstance().getTdescPath(), e);
+            LOGGER.log(Level.WARNING, "Error reading Tuning Descriptions from the specified path: " + SettingsService.getSingletonInstance().getTdescPath(), e);
         }
     }
 
     @Override
     public void onSettingsUpdate() {
-        Path path = SettingsService.getInstance().getTdescPath();
+        Path path = SettingsService.getSingletonInstance().getTdescPath();
         if (!path.equals(this.tdescPath)) {
             // update the path
             this.tdescPath = path;

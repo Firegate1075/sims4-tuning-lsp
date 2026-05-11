@@ -21,17 +21,11 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
     // completion provider for tuning files based on the tuning description
     private static final Logger LOGGER = Logger.getLogger(TuningDescriptionCompletionProvider.class.getName());
 
-    private TuningDescriptionService tuningDescriptionService;
-
-    public TuningDescriptionCompletionProvider(TuningDescriptionService tuningDescriptionService) {
-        this.tuningDescriptionService =  tuningDescriptionService;
-    }
-
     @Override
     public void onTagOpen(ICompletionRequest iCompletionRequest, ICompletionResponse iCompletionResponse, CancelChecker cancelChecker) throws Exception {
         if (iCompletionRequest.getParentElement() != null) {
             LOGGER.info("Tag open completion requested for element with parent " + iCompletionRequest.getParentElement().getNodeName());
-            Optional<ITuningDescriptionElement> parentDescription = TuningValidator.getDescriptionOfNode(tuningDescriptionService, iCompletionRequest.getXMLDocument(), iCompletionRequest.getParentElement());
+            Optional<ITuningDescriptionElement> parentDescription = TuningValidator.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getParentElement());
             if (parentDescription.isEmpty()) {
                 return;
             }
@@ -47,7 +41,7 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
     private List<CompletionItem> getCompletionItemsForChildren(ICompletionRequest request, ITuningDescriptionElement parentDescription) {
         LOGGER.info("Request for completion items for parent element of type " + parentDescription.getClass().getSimpleName());
         // get completion items from parent description
-        List<ITuningDescriptionElement> childrenDescriptions = TuningValidator.getChildrenOfTuningDescriptionElement(tuningDescriptionService, parentDescription);
+        List<ITuningDescriptionElement> childrenDescriptions = TuningValidator.getChildrenOfTuningDescriptionElement(parentDescription);
         List<CompletionItem> completionItems = new ArrayList<>();
 
         // we need to first find the description for the latest node in the XML document
@@ -62,13 +56,13 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
                 // we have a predecessor within the container element
                 int predecessorIndex = indexOfNode - 1;
                 DOMNode predecessor = request.getNode().getParentNode().getChild(predecessorIndex);
-                predecessorDescription = TuningValidator.getDescriptionOfNode(tuningDescriptionService, request.getXMLDocument(), predecessor);
+                predecessorDescription = TuningValidator.getDescriptionOfNode(request.getXMLDocument(), predecessor);
             }
 
             // now we suggest all descriptions after the predecessor and up to the next one without a default
             for (ITuningDescriptionElement childDescription : tunableTuple.getTunableElements()) {
                 if (childDescription instanceof TdescFragTag tdescFragTag) {
-                    childDescription = TuningValidator.getTdescFragTagContent(tuningDescriptionService, tdescFragTag);
+                    childDescription = TuningValidator.getTdescFragTagContent(tdescFragTag);
                 }
 
                 // if there is a predecessor, skip until we find it
@@ -82,7 +76,7 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
 
 
                 // we stop if the description is not optional
-                if (!TuningValidator.isElementOptional(tuningDescriptionService, childDescription)) {
+                if (!TuningValidator.isElementOptional(childDescription)) {
                     break;
                 }
             }
@@ -90,7 +84,7 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
             // all other container elements suggest all their children
             for (ITuningDescriptionElement childDescription : childrenDescriptions) {
                 if (childDescription instanceof TdescFragTag tdescFragTag) {
-                    childDescription = TuningValidator.getTdescFragTagContent(tuningDescriptionService, tdescFragTag);
+                    childDescription = TuningValidator.getTdescFragTagContent(tdescFragTag);
                 }
 
                 Optional<CompletionItem> item = buildCompletionItemForElement(request, childDescription);
@@ -153,6 +147,7 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
 
     @Override
     public void onXMLContent(ICompletionRequest iCompletionRequest, ICompletionResponse iCompletionResponse, CancelChecker cancelChecker) throws Exception {
+        LOGGER.info("XML content completion requested. request: parentElement=" + iCompletionRequest.getParentElement());
         // TODO
     }
 
@@ -163,6 +158,16 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
 
     @Override
     public void onAttributeValue(String s, ICompletionRequest iCompletionRequest, ICompletionResponse iCompletionResponse, CancelChecker cancelChecker) throws Exception {
+        LOGGER.info("Attribute value completion requested for attribute " + iCompletionRequest.getCurrentAttributeName() + " of element " + iCompletionRequest.getCurrentTag());
+        Optional<ITuningDescriptionElement> parentDescription = TuningValidator.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getNode());
+        if (parentDescription.isEmpty()) {
+            return;
+        }
+
+        List<CompletionItem> completionItems = getCompletionItemsForChildren(iCompletionRequest, parentDescription.get());
+        for (CompletionItem completionItem : completionItems) {
+            iCompletionResponse.addCompletionItem(completionItem);
+        }
         // TODO
         // for TunableVariant types -> also autocomplete the corresponding child element
     }

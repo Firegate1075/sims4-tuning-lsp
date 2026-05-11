@@ -14,18 +14,16 @@ import java.util.concurrent.CancellationException;
 
 public class QuickFixProviderAdapter implements ICodeActionParticipant, ITuningDescriptionObserver {
     private boolean isActive = false;
-    private TuningDescriptionService tuningDescriptionService;
-    private ICodeActionParticipant quickFixProvider;
+    private final ICodeActionParticipant quickFixProvider;
 
-    public QuickFixProviderAdapter(ICodeActionParticipant quickFixProvider, TuningDescriptionService tuningDescriptionService) {
-        tuningDescriptionService.registerObserver(this);
-        this.tuningDescriptionService = tuningDescriptionService;
+    public QuickFixProviderAdapter(ICodeActionParticipant quickFixProvider) {
+        TuningDescriptionService.getSingletonInstance().registerObserver(this);
         this.quickFixProvider = quickFixProvider;
     }
 
     @Override
     public void onTuningDescriptionInitialized() {
-        if (tuningDescriptionService.isInitialized()) {
+        if (TuningDescriptionService.getSingletonInstance().isInitialized()) {
             isActive = true;
         }
     }

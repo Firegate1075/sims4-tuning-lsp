@@ -9,10 +9,8 @@ import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataM
 import org.eclipse.lemminx.extensions.sims4tunings.services.SettingsService;
 import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;
 import org.eclipse.lemminx.services.XMLLanguageService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -62,10 +60,10 @@ class TuningValidatorTest {
         var parsedTuningDescriptions = TuningDescriptionParser.parseTuningDescriptionXML(DEFAULT_TDESC_PATH);
         assert(parsedTuningDescriptions.size() == 1764);
         TuningDescriptionRegistry registry = new TuningDescriptionRegistry();
-        TuningDescriptionService tuningDescriptionService = new TuningDescriptionService(registry);
+        TuningDescriptionService.createSingletonInstance(registry);
 
         // update settings to use default path
-        SettingsService.getInstance().updateSettings(null);
+        SettingsService.getSingletonInstance().updateSettings(null);
 
         // add all the tuning descriptions
         parsedTuningDescriptions.forEach(registry::addTuningDescription);
@@ -73,11 +71,11 @@ class TuningValidatorTest {
         XMLLanguageService xmlLanguageService = new XMLLanguageService();
         TextDocument document = new TextDocument(TEST_DOCUMENT, "test://test/test.xml");
         DOMDocument domDocument = DOMParser.getInstance().parse(document, xmlLanguageService.getResolverExtensionManager());
-        Optional<ITuningDescriptionElement> description = TuningValidator.getDescriptionOfNode(tuningDescriptionService, domDocument, domDocument.getDocumentElement());
+        Optional<ITuningDescriptionElement> description = TuningValidator.getDescriptionOfNode(domDocument, domDocument.getDocumentElement());
         assertTrue(description.isPresent());
 
         DOMNode tunableNode = domDocument.getDocumentElement().getChild(2).getFirstChild().getFirstChild().getFirstChild().getFirstChild().getFirstChild().getFirstChild();
-        description = TuningValidator.getDescriptionOfNode(tuningDescriptionService, domDocument, tunableNode);
+        description = TuningValidator.getDescriptionOfNode(domDocument, tunableNode);
         assertTrue(description.isPresent());
         assert(((Tunable) description.get()).getType().get().equals("buff"));
     }

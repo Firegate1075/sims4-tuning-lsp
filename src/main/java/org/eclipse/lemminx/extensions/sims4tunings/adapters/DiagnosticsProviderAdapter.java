@@ -13,18 +13,16 @@ import java.util.List;
 
 public class DiagnosticsProviderAdapter implements IDiagnosticsParticipant, ITuningDescriptionObserver {
     private boolean isActive = false;
-    private TuningDescriptionService tuningDescriptionService;
-    private IDiagnosticsParticipant diagnosticsProvider;
+    private final IDiagnosticsParticipant diagnosticsProvider;
 
-    public DiagnosticsProviderAdapter(IDiagnosticsParticipant diagnosticsProvider, TuningDescriptionService tuningDescriptionService) {
-        tuningDescriptionService.registerObserver(this);
-        this.tuningDescriptionService = tuningDescriptionService;
+    public DiagnosticsProviderAdapter(IDiagnosticsParticipant diagnosticsProvider) {
+        TuningDescriptionService.getSingletonInstance().registerObserver(this);
         this.diagnosticsProvider = diagnosticsProvider;
     }
 
     @Override
     public void onTuningDescriptionInitialized() {
-        if (tuningDescriptionService.isInitialized()) {
+        if (TuningDescriptionService.getSingletonInstance().isInitialized()) {
             isActive = true;
         }
     }
