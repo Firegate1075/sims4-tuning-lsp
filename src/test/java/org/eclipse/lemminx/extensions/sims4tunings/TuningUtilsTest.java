@@ -17,7 +17,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TuningValidatorTest {
+class TuningUtilsTest {
     private static final String PROJECT_DIRECTORY = System.getProperty("user.dir");
     private static final Path DEFAULT_TDESC_PATH = Paths.get(PROJECT_DIRECTORY + "/tdesc");
 
@@ -71,11 +71,11 @@ class TuningValidatorTest {
         XMLLanguageService xmlLanguageService = new XMLLanguageService();
         TextDocument document = new TextDocument(TEST_DOCUMENT, "test://test/test.xml");
         DOMDocument domDocument = DOMParser.getInstance().parse(document, xmlLanguageService.getResolverExtensionManager());
-        Optional<ITuningDescriptionElement> description = TuningValidator.getDescriptionOfNode(domDocument, domDocument.getDocumentElement());
+        Optional<ITuningDescriptionElement> description = TuningUtils.getDescriptionOfNode(domDocument, domDocument.getDocumentElement());
         assertTrue(description.isPresent());
 
         DOMNode tunableNode = domDocument.getDocumentElement().getChild(2).getFirstChild().getFirstChild().getFirstChild().getFirstChild().getFirstChild().getFirstChild();
-        description = TuningValidator.getDescriptionOfNode(domDocument, tunableNode);
+        description = TuningUtils.getDescriptionOfNode(domDocument, tunableNode);
         assertTrue(description.isPresent());
         assert(((Tunable) description.get()).getType().get().equals("buff"));
     }

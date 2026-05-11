@@ -1,9 +1,8 @@
 package org.eclipse.lemminx.extensions.sims4tunings.providers;
 
 import org.eclipse.lemminx.dom.DOMNode;
-import org.eclipse.lemminx.extensions.sims4tunings.TuningValidator;
+import org.eclipse.lemminx.extensions.sims4tunings.TuningUtils;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.*;
-import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionParticipant;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionRequest;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionResponse;
@@ -25,7 +24,7 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
     public void onTagOpen(ICompletionRequest iCompletionRequest, ICompletionResponse iCompletionResponse, CancelChecker cancelChecker) throws Exception {
         if (iCompletionRequest.getParentElement() != null) {
             LOGGER.info("Tag open completion requested for element with parent " + iCompletionRequest.getParentElement().getNodeName());
-            Optional<ITuningDescriptionElement> parentDescription = TuningValidator.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getParentElement());
+            Optional<ITuningDescriptionElement> parentDescription = TuningUtils.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getParentElement());
             if (parentDescription.isEmpty()) {
                 return;
             }
@@ -41,7 +40,7 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
     private List<CompletionItem> getCompletionItemsForChildren(ICompletionRequest request, ITuningDescriptionElement parentDescription) {
         LOGGER.info("Request for completion items for parent element of type " + parentDescription.getClass().getSimpleName());
         // get completion items from parent description
-        List<ITuningDescriptionElement> childrenDescriptions = TuningValidator.getChildrenOfTuningDescriptionElement(parentDescription);
+        List<ITuningDescriptionElement> childrenDescriptions = TuningUtils.getChildrenOfTuningDescriptionElement(parentDescription);
         List<CompletionItem> completionItems = new ArrayList<>();
 
         // we need to first find the description for the latest node in the XML document
@@ -49,20 +48,20 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
         if (parentDescription instanceof TunableTuple tunableTuple) {
 
             // we first need to find the corresponding description for the last node
-            int indexOfNode = TuningValidator.getIndexOfElementInList(request.getNode()).orElseThrow();
+            int indexOfNode = TuningUtils.getIndexOfElementInList(request.getNode()).orElseThrow();
 
             Optional<ITuningDescriptionElement> predecessorDescription = Optional.empty();
             if (indexOfNode > 0) {
                 // we have a predecessor within the container element
                 int predecessorIndex = indexOfNode - 1;
                 DOMNode predecessor = request.getNode().getParentNode().getChild(predecessorIndex);
-                predecessorDescription = TuningValidator.getDescriptionOfNode(request.getXMLDocument(), predecessor);
+                predecessorDescription = TuningUtils.getDescriptionOfNode(request.getXMLDocument(), predecessor);
             }
 
             // now we suggest all descriptions after the predecessor and up to the next one without a default
             for (ITuningDescriptionElement childDescription : tunableTuple.getTunableElements()) {
                 if (childDescription instanceof TdescFragTag tdescFragTag) {
-                    childDescription = TuningValidator.getTdescFragTagContent(tdescFragTag);
+                    childDescription = TuningUtils.getTdescFragTagContent(tdescFragTag);
                 }
 
                 // if there is a predecessor, skip until we find it
@@ -76,7 +75,7 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
 
 
                 // we stop if the description is not optional
-                if (!TuningValidator.isElementOptional(childDescription)) {
+                if (!TuningUtils.isElementOptional(childDescription)) {
                     break;
                 }
             }
@@ -84,7 +83,7 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
             // all other container elements suggest all their children
             for (ITuningDescriptionElement childDescription : childrenDescriptions) {
                 if (childDescription instanceof TdescFragTag tdescFragTag) {
-                    childDescription = TuningValidator.getTdescFragTagContent(tdescFragTag);
+                    childDescription = TuningUtils.getTdescFragTagContent(tdescFragTag);
                 }
 
                 Optional<CompletionItem> item = buildCompletionItemForElement(request, childDescription);
@@ -103,11 +102,11 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
         }
 
 
-        Optional<String> name = TuningValidator.getTuningDescriptionElementName(element);
-        Optional<String> description = TuningValidator.getTuningDescriptionElementDescription(element);
-        Optional<String> display = TuningValidator.getTuningDescriptionElementDisplay(element);
-        Optional<String> className = TuningValidator.getTuningDescriptionElementClassName(element);
-        Optional<String> typeName = TuningValidator.getTuningDescriptionElementTypeName(element);
+        Optional<String> name = TuningUtils.getTuningDescriptionElementName(element);
+        Optional<String> description = TuningUtils.getTuningDescriptionElementDescription(element);
+        Optional<String> display = TuningUtils.getTuningDescriptionElementDisplay(element);
+        Optional<String> className = TuningUtils.getTuningDescriptionElementClassName(element);
+        Optional<String> typeName = TuningUtils.getTuningDescriptionElementTypeName(element);
 
         String label;
         if (name.isPresent()) {
@@ -159,7 +158,7 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
     @Override
     public void onAttributeValue(String s, ICompletionRequest iCompletionRequest, ICompletionResponse iCompletionResponse, CancelChecker cancelChecker) throws Exception {
         LOGGER.info("Attribute value completion requested for attribute " + iCompletionRequest.getCurrentAttributeName() + " of element " + iCompletionRequest.getCurrentTag());
-        Optional<ITuningDescriptionElement> elementDescription = TuningValidator.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getNode());
+        Optional<ITuningDescriptionElement> elementDescription = TuningUtils.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getNode());
         LOGGER.info("Element description: " + elementDescription);
         if (elementDescription.isEmpty()) {
             return;
