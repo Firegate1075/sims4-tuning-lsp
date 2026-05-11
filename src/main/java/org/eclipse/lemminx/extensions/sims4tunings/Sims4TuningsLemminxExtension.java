@@ -3,7 +3,10 @@ package org.eclipse.lemminx.extensions.sims4tunings;
 import org.eclipse.lemminx.extensions.sims4tunings.adapters.CompletionProviderAdapter;
 import org.eclipse.lemminx.extensions.sims4tunings.adapters.DiagnosticsProviderAdapter;
 import org.eclipse.lemminx.extensions.sims4tunings.adapters.QuickFixProviderAdapter;
-import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.TuningRoot;
+import org.eclipse.lemminx.extensions.sims4tunings.providers.RootElementCompletionProvider;
+import org.eclipse.lemminx.extensions.sims4tunings.providers.TuningDescriptionCompletionProvider;
+import org.eclipse.lemminx.extensions.sims4tunings.providers.TuningHashDiagnosticsProvider;
+import org.eclipse.lemminx.extensions.sims4tunings.providers.TuningHashQuickFixProvider;
 import org.eclipse.lemminx.extensions.sims4tunings.services.SettingsService;
 import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;
 import org.eclipse.lemminx.services.extensions.IXMLExtension;
@@ -11,7 +14,6 @@ import org.eclipse.lemminx.services.extensions.XMLExtensionsRegistry;
 import org.eclipse.lemminx.services.extensions.save.ISaveContext;
 import org.eclipse.lsp4j.InitializeParams;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 public class Sims4TuningsLemminxExtension implements IXMLExtension {
