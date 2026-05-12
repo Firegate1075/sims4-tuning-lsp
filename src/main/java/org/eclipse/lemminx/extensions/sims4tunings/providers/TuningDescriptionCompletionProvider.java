@@ -86,6 +86,7 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
             // if the t="" attribute is present and correct, we need to find the corresponding child and suggest it
             // otherwise suggest all variants
 
+            // TODO: missing already present check
             String typeAttribute = parentNode.domNode().getAttribute("t");
 
             if (typeAttribute != null) {
@@ -119,12 +120,63 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
                     childDescription = TuningUtils.getTdescFragTagContent(tdescFragTag);
                 }
 
-                Optional<CompletionItem> item = buildCompletionItemForElement(request, childDescription);
-                item.ifPresent(completionItems::add);
+                if (childDescription instanceof TunableVariant tunableVariant && tunableVariant.getName().isEmpty()) {
+                    // if we have a tunable variant without a name, suggest all possible values
+                    for (ITuningDescriptionElement variant : tunableVariant.getTunableElements()) {
+                        if (variant instanceof TdescFragTag tdescFragTag) {
+                            variant = TuningUtils.getTdescFragTagContent(tdescFragTag);
+                        }
+                        Optional<CompletionItem> item = buildCompletionItemForVariantChild(request, tunableVariant, variant);
+                        item.ifPresent(completionItems::add);
+                    }
+                } else {
+                    // otherwise suggest the child element
+                    Optional<CompletionItem> item = buildCompletionItemForElement(request, childDescription);
+                    item.ifPresent(completionItems::add);
+                }
             }
         }
 
         return completionItems;
+    }
+
+    /**
+     * Build a completion item for a tunable variant and its child for a tunable variant without a name attribute.
+     * @param request the completion request
+     * @param tunableVariant the tunable variant tuning description element
+     * @param childElement the child element of the tunable variant
+     * @return the optional completion item
+     */
+    private Optional<CompletionItem> buildCompletionItemForVariantChild(ICompletionRequest request, TunableVariant tunableVariant, ITuningDescriptionElement childElement) {
+        // only tunable elements may appear in tuning files
+        if (!(childElement instanceof ITunable)) {
+            return Optional.empty();
+        }
+
+
+        String childName = TuningUtils.getTuningDescriptionElementName(childElement).orElseThrow();
+        Optional<String> childDescription = TuningUtils.getTuningDescriptionElementDescription(childElement);
+
+
+        CompletionItem item = new CompletionItem();
+
+        String newText = "<" + tunableVariant.getTunableTag() + " t=\"" + childName + "\">\n\t<"  + ((ITunable) childElement).getTunableTag() + " n=\"" + childName + "\"";
+
+        if (childElement instanceof TunableVariant) {
+            newText += " t=\"$1\"";
+        }
+        newText += ">$0</" + ((ITunable) childElement).getTunableTag() + ">\n</" + tunableVariant.getTunableTag() + ">";
+
+        item.setLabel(childName);
+        item.setDocumentation(Either.forLeft(childDescription.orElse("")));
+        TextEdit textEdit = new TextEdit();
+        textEdit.setNewText(newText);
+        textEdit.setRange(request.getReplaceRange());
+        item.setTextEdit(Either.forLeft(textEdit));
+        item.setFilterText(textEdit.getNewText());
+        item.setSortText(item.getLabel());
+
+        return Optional.of(item);
     }
 
     private Optional<CompletionItem> buildCompletionItemForElement(ICompletionRequest request, ITuningDescriptionElement element) {
