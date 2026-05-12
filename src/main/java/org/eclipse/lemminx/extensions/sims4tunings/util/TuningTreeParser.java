@@ -4,17 +4,16 @@ import org.eclipse.lemminx.dom.DOMDocument;
 import org.eclipse.lemminx.dom.DOMNode;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.ITuningDescriptionElement;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.TdescFragTag;
-import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.CommentElement;
-import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.NoValidTuningDescription;
-import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.Node;
-import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.TextElement;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.*;
 import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class TuningTreeParser {
 
-    public static Optional<Node> parseTree(DOMDocument domDocument) {
+    public static Optional<ContainerNode> parseTree(DOMDocument domDocument) {
         // handle root element
         DOMNode domRoot = domDocument.getDocumentElement();
         Optional<? extends ITuningDescriptionElement> rootDescription = switch (domRoot.getNodeName()) {
@@ -27,8 +26,8 @@ public class TuningTreeParser {
             return Optional.empty();
         }
 
-        ArrayList<Node> children = new ArrayList<>();
-        Node rootNode = new Node(rootDescription.get(), domRoot, null, children);
+        ArrayList<INode> children = new ArrayList<>();
+        ContainerNode rootNode = new ContainerNode(rootDescription.get(), domRoot, null, children);
         addChildNodes(rootNode);
 
         return Optional.of(rootNode);
@@ -38,46 +37,64 @@ public class TuningTreeParser {
      * Takes a parent node and adds all child nodes to the parent node
      * @param parentNode the parent node
      */
-    private static void addChildNodes(Node parentNode) {
+    private static void addChildNodes(INodeWithChildren parentNode) {
         List<DOMNode> domChildren = parentNode.domNode().getChildren();
 
         for (DOMNode domChild : domChildren) {
-            // find tuning description
-            ITuningDescriptionElement tuningDescription = getDescriptionOfNode(parentNode.tuningDescription(), domChild).orElse(new NoValidTuningDescription());
+            if (domChild.isElement()) {
+                // if parent node has tuning description
+                if (parentNode instanceof ContainerNode parentContainerNode) {
+                    Optional<ITuningDescriptionElement> tuningDescription = getDescriptionOfNode(parentContainerNode.tuningDescription(), domChild);
+                    INodeWithChildren childNode;
 
-            Node childNode = new Node(tuningDescription, domChild, parentNode, new ArrayList<>());
-            parentNode.children().add(childNode);
-            addChildNodes(childNode);
+                    if (tuningDescription.isEmpty()) {
+                        childNode = new InvalidNode(domChild, parentNode, new ArrayList<>());
+                    } else {
+                        // found matching tuning description
+                        childNode = new ContainerNode(tuningDescription.get(), domChild, parentNode, new ArrayList<>());
+                    }
+
+                    parentNode.children().add(childNode);
+                    addChildNodes(childNode);
+                } else if (parentNode instanceof InvalidNode parentInvalidNode){
+                    InvalidNode childNode = new InvalidNode(domChild, parentNode, new ArrayList<>());
+                    parentNode.children().add(childNode);
+                    addChildNodes(childNode);
+                }
+            } else if (domChild.isText()) {
+                TextNode childNode = new TextNode(domChild.getTextContent(), domChild, parentNode);
+                parentNode.children().add(childNode);
+            } else if (domChild.isComment()) {
+                CommentNode childNode = new CommentNode(domChild.getTextContent(), domChild, parentNode);
+                parentNode.children().add(childNode);
+            }
         }
     }
 
+    /**
+     * Get the description of a DOM element node with the given parent tuning description element.
+     * @param parentDescription tuning description element of the parent node
+     * @param node the DOM element node
+     * @return the optional description of the node
+     */
     private static Optional<ITuningDescriptionElement> getDescriptionOfNode(ITuningDescriptionElement parentDescription, DOMNode node) {
-        if (node.isElement()) {
-            // node is an element (tag)
-            for (ITuningDescriptionElement tuningDescription : TuningUtils.getChildrenOfTuningDescriptionElement(parentDescription)) {
-                // resolve tdesc frag tags to content
-                if (tuningDescription instanceof TdescFragTag tdescFragTag) {
-                    tuningDescription = TuningUtils.getTdescFragTagContent(tdescFragTag);
-                }
-
-                if (TuningUtils.isTunableNodeMatchingDescription(node, tuningDescription)) {
-                    return Optional.of(tuningDescription);
-                }
+        for (ITuningDescriptionElement tuningDescription : TuningUtils.getChildrenOfTuningDescriptionElement(parentDescription)) {
+            // resolve tdesc frag tags to content
+            if (tuningDescription instanceof TdescFragTag tdescFragTag) {
+                tuningDescription = TuningUtils.getTdescFragTagContent(tdescFragTag);
             }
-        } else if (node.isText()) {
-            // node is a text node (terminal node)
-            return Optional.of(new TextElement());
-        } else if (node.isComment()) {
-            // node is a comment node
-            return Optional.of(new CommentElement());
+
+            if (TuningUtils.isTunableNodeMatchingDescription(node, tuningDescription)) {
+                return Optional.of(tuningDescription);
+            }
         }
 
         return Optional.empty();
     }
 
-    public static Optional<Node> getNodeFromDOM(Node root, DOMNode targetDomNode) {
+    public static Optional<INode> getNodeFromDOM(ContainerNode root, DOMNode targetDomNode) {
         Deque<DOMNode> domNodeSequence = new ArrayDeque<>();
-        Deque<Node> nodeSequence = new ArrayDeque<>();
+        Deque<INode> nodeSequence = new ArrayDeque<>();
 
         // build sequence of dom nodes from root to target node
         DOMNode currentNode = targetDomNode;
@@ -89,17 +106,26 @@ public class TuningTreeParser {
         nodeSequence.addFirst(root);
 
         for (DOMNode domNode : domNodeSequence) {
-            assert nodeSequence.peekLast() != null;
-            for (Node child : nodeSequence.peekLast().children()) {
-                if (child.domNode().equals(domNode)) {
-                    nodeSequence.addLast(child);
+            INode lastNode = nodeSequence.peekLast();
+
+            // check if the last found node has children
+            if (lastNode instanceof INodeWithChildren nodeWithChildren) {
+                for (INode child : nodeWithChildren.children()) {
+                    if (child.domNode().equals(domNode)) {
+                        nodeSequence.addLast(child);
+                    }
                 }
             }
         }
 
-        assert nodeSequence.peekLast() != null;
-        if (nodeSequence.peekLast().domNode().equals(targetDomNode)) {
-            return Optional.of(nodeSequence.peekLast());
+        INode lastNode = nodeSequence.peekLast();
+
+        if (lastNode == null) {
+            return Optional.empty();
+        }
+
+        if (lastNode.domNode().equals(targetDomNode)) {
+            return Optional.of(lastNode);
         }
 
         return  Optional.empty();

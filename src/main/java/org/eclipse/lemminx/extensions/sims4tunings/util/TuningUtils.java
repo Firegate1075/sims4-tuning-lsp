@@ -110,7 +110,6 @@ public class TuningUtils {
             hasCorrectName = true;
         } else {
             hasCorrectName = node.getAttribute("n").equals(descriptionName.get());
-
         }
 
         boolean variantTypeValid = true;

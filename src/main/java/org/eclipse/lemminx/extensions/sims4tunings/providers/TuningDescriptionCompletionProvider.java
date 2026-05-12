@@ -1,6 +1,11 @@
 package org.eclipse.lemminx.extensions.sims4tunings.providers;
 
 import org.eclipse.lemminx.dom.DOMNode;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.ContainerNode;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.INode;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.INodeWithChildren;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.Node;
+import org.eclipse.lemminx.extensions.sims4tunings.util.TuningTreeParser;
 import org.eclipse.lemminx.extensions.sims4tunings.util.TuningUtils;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.*;
 import org.eclipse.lemminx.services.extensions.completion.ICompletionParticipant;
@@ -24,6 +29,16 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
     public void onTagOpen(ICompletionRequest iCompletionRequest, ICompletionResponse iCompletionResponse, CancelChecker cancelChecker) throws Exception {
         if (iCompletionRequest.getParentElement() != null) {
             LOGGER.info("Tag open completion requested for element with parent " + iCompletionRequest.getParentElement().getNodeName());
+
+            // parse the DOM tree
+            Optional<ContainerNode> root = TuningTreeParser.parseTree(iCompletionRequest.getXMLDocument());
+            if (root.isEmpty()) {
+                return;
+            }
+            Optional<INode> parentNode = TuningTreeParser.getNodeFromDOM(root.get(), iCompletionRequest.getParentElement());
+            if (parentNode instanceof)
+
+
             Optional<ITuningDescriptionElement> parentDescription = TuningUtils.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getParentElement());
             if (parentDescription.isEmpty()) {
                 return;
@@ -35,6 +50,24 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
                 iCompletionResponse.addCompletionItem(completionItem);
             }
         }
+
+        if (iCompletionRequest.getParentElement() != null) {
+            LOGGER.info("Tag open completion requested for element with parent " + iCompletionRequest.getParentElement().getNodeName());
+            Optional<ITuningDescriptionElement> parentDescription = TuningUtils.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getParentElement());
+            if (parentDescription.isEmpty()) {
+                return;
+            }
+
+            List<CompletionItem> completionItems = getCompletionItemsForChildren(iCompletionRequest, parentDescription.get());
+            LOGGER.info("Received " + completionItems.size() + " completion items");
+            for (CompletionItem completionItem : completionItems) {
+                iCompletionResponse.addCompletionItem(completionItem);
+            }
+        }
+    }
+
+    private List<CompletionItem> getCompletionItemsForChildren(ContainerNode parentNode) {
+
     }
 
     private List<CompletionItem> getCompletionItemsForChildren(ICompletionRequest request, ITuningDescriptionElement parentDescription) {
@@ -158,6 +191,9 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
     @Override
     public void onAttributeValue(String s, ICompletionRequest iCompletionRequest, ICompletionResponse iCompletionResponse, CancelChecker cancelChecker) throws Exception {
         LOGGER.info("Attribute value completion requested for attribute " + iCompletionRequest.getCurrentAttributeName() + " of element " + iCompletionRequest.getCurrentTag());
+        Optional<ContainerNode> root = TuningTreeParser.parseTree(iCompletionRequest.getXMLDocument());
+        Optional<INode> node = TuningTreeParser.getNodeFromDOM(root.get(), iCompletionRequest.getNode()); // TODO: remove .get()
+
         Optional<ITuningDescriptionElement> elementDescription = TuningUtils.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getNode());
         LOGGER.info("Element description: " + elementDescription);
         if (elementDescription.isEmpty()) {
