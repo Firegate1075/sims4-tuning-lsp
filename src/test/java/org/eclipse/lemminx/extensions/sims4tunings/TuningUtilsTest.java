@@ -6,7 +6,7 @@ import org.eclipse.lemminx.dom.DOMNode;
 import org.eclipse.lemminx.dom.DOMParser;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.ITuningDescriptionElement;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.Tunable;
-import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.Node;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.INode;
 import org.eclipse.lemminx.extensions.sims4tunings.repository.TuningDescriptionRegistry;
 import org.eclipse.lemminx.extensions.sims4tunings.services.SettingsService;
 import org.eclipse.lemminx.extensions.sims4tunings.services.TuningDescriptionService;

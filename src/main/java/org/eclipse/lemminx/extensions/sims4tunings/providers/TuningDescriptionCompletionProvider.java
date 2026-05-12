@@ -4,7 +4,7 @@ import org.eclipse.lemminx.dom.DOMNode;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.ContainerNode;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.INode;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.INodeWithChildren;
-import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.Node;
+import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.INode;
 import org.eclipse.lemminx.extensions.sims4tunings.util.TuningTreeParser;
 import org.eclipse.lemminx.extensions.sims4tunings.util.TuningUtils;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.*;
@@ -16,6 +16,7 @@ import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.jsonrpc.CancelChecker;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,8 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
 
     @Override
     public void onTagOpen(ICompletionRequest iCompletionRequest, ICompletionResponse iCompletionResponse, CancelChecker cancelChecker) throws Exception {
-        if (iCompletionRequest.getParentElement() != null) {
+        // check for root
+        if (iCompletionRequest.getParentElement() != null && !iCompletionRequest.getNode().equals(iCompletionRequest.getXMLDocument().getDocumentElement())) {
             LOGGER.info("Tag open completion requested for element with parent " + iCompletionRequest.getParentElement().getNodeName());
 
             // parse the DOM tree
@@ -35,85 +37,83 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
             if (root.isEmpty()) {
                 return;
             }
-            Optional<INode> parentNode = TuningTreeParser.getNodeFromDOM(root.get(), iCompletionRequest.getParentElement());
-            if (parentNode instanceof)
 
-
-            Optional<ITuningDescriptionElement> parentDescription = TuningUtils.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getParentElement());
-            if (parentDescription.isEmpty()) {
-                return;
-            }
-
-            List<CompletionItem> completionItems = getCompletionItemsForChildren(iCompletionRequest, parentDescription.get());
-            LOGGER.info("Received " + completionItems.size() + " completion items");
-            for (CompletionItem completionItem : completionItems) {
-                iCompletionResponse.addCompletionItem(completionItem);
-            }
-        }
-
-        if (iCompletionRequest.getParentElement() != null) {
-            LOGGER.info("Tag open completion requested for element with parent " + iCompletionRequest.getParentElement().getNodeName());
-            Optional<ITuningDescriptionElement> parentDescription = TuningUtils.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getParentElement());
-            if (parentDescription.isEmpty()) {
-                return;
-            }
-
-            List<CompletionItem> completionItems = getCompletionItemsForChildren(iCompletionRequest, parentDescription.get());
-            LOGGER.info("Received " + completionItems.size() + " completion items");
-            for (CompletionItem completionItem : completionItems) {
-                iCompletionResponse.addCompletionItem(completionItem);
+            INode parentNode = TuningTreeParser.getNodeFromDOM(root.get(), iCompletionRequest.getParentElement()).get();
+            if (parentNode instanceof ContainerNode parent) {
+                List<CompletionItem> completionItems = getCompletionItemsForChildren(parent, iCompletionRequest);
+                LOGGER.info("Received " + completionItems.size() + " completion items");
+                for (CompletionItem completionItem : completionItems) {
+                    iCompletionResponse.addCompletionItem(completionItem);
+                }
             }
         }
     }
 
-    private List<CompletionItem> getCompletionItemsForChildren(ContainerNode parentNode) {
-
-    }
-
-    private List<CompletionItem> getCompletionItemsForChildren(ICompletionRequest request, ITuningDescriptionElement parentDescription) {
+    private List<CompletionItem> getCompletionItemsForChildren(ContainerNode parentNode, ICompletionRequest request) {
+        ITuningDescriptionElement parentDescription = parentNode.tuningDescription();
         LOGGER.info("Request for completion items for parent element of type " + parentDescription.getClass().getSimpleName());
-        // get completion items from parent description
         List<ITuningDescriptionElement> childrenDescriptions = TuningUtils.getChildrenOfTuningDescriptionElement(parentDescription);
         List<CompletionItem> completionItems = new ArrayList<>();
 
-        // we need to first find the description for the latest node in the XML document
-        // then, we can suggest all the descriptions until the next child without a default
-        if (parentDescription instanceof TunableTuple tunableTuple) {
-
-            // we first need to find the corresponding description for the last node
-            int indexOfNode = TuningUtils.getIndexOfElementInList(request.getNode()).orElseThrow();
-
-            Optional<ITuningDescriptionElement> predecessorDescription = Optional.empty();
-            if (indexOfNode > 0) {
-                // we have a predecessor within the container element
-                int predecessorIndex = indexOfNode - 1;
-                DOMNode predecessor = request.getNode().getParentNode().getChild(predecessorIndex);
-                predecessorDescription = TuningUtils.getDescriptionOfNode(request.getXMLDocument(), predecessor);
-            }
-
-            // now we suggest all descriptions after the predecessor and up to the next one without a default
-            for (ITuningDescriptionElement childDescription : tunableTuple.getTunableElements()) {
+        if (parentDescription instanceof TunableTuple || parentDescription instanceof ClassElement || parentDescription instanceof ModuleElement || parentDescription instanceof InstanceElement) {
+            for (ITuningDescriptionElement childDescription : childrenDescriptions) {
+                // resolve tdesc frag tags
                 if (childDescription instanceof TdescFragTag tdescFragTag) {
                     childDescription = TuningUtils.getTdescFragTagContent(tdescFragTag);
                 }
 
-                // if there is a predecessor, skip until we find it
-                if (predecessorDescription.isPresent() && childDescription.equals(predecessorDescription.get())) {
+
+                // check whether the candidate is already present in the tunable tuple
+                boolean alreadyPresent = false;
+                for (INode siblingNode : parentNode.children()) {
+                    if (siblingNode instanceof ContainerNode siblingContainer) {
+                        if (siblingContainer.tuningDescription().equals(childDescription)) {
+                            alreadyPresent = true;
+                            break;
+                        }
+                    }
+                }
+
+                // skip elements that are already present
+                if (alreadyPresent) {
                     continue;
                 }
 
-                // add the elements
                 Optional<CompletionItem> item = buildCompletionItemForElement(request, childDescription);
                 item.ifPresent(completionItems::add);
+            }
+        } else if (parentDescription instanceof TunableVariant tunableVariant) {
+            // if the t="" attribute is present and correct, we need to find the corresponding child and suggest it
+            // otherwise suggest all variants
 
+            String typeAttribute = parentNode.domNode().getAttribute("t");
 
-                // we stop if the description is not optional
-                if (!TuningUtils.isElementOptional(childDescription)) {
-                    break;
+            if (typeAttribute != null) {
+                // try to find the corresponding child
+                Optional<ITuningDescriptionElement> child = childrenDescriptions.stream()
+                        .filter(childDescription -> {
+                            Optional<String> childDescriptionName = TuningUtils.getTuningDescriptionElementName(childDescription);
+                            return childDescriptionName.map(name -> name.equals(typeAttribute)).orElse(false);
+                        })
+                        .findAny();
+
+                if (child.isPresent()) {
+                    Optional<CompletionItem> item = buildCompletionItemForElement(request, child.get());
+                    item.ifPresent(completionItems::add);
+                }
+            } else {
+                // suggest all variants
+                for (ITuningDescriptionElement childDescription : childrenDescriptions) {
+                    if (childDescription instanceof TdescFragTag tdescFragTag) {
+                        childDescription = TuningUtils.getTdescFragTagContent(tdescFragTag);
+                    }
+
+                    Optional<CompletionItem> item = buildCompletionItemForElement(request, childDescription);
+                    item.ifPresent(completionItems::add);
                 }
             }
-        } else {
-            // all other container elements suggest all their children
+        } else if (parentDescription instanceof TunableList tunableList) {
+            // lists suggest all their children (which should only be one)
             for (ITuningDescriptionElement childDescription : childrenDescriptions) {
                 if (childDescription instanceof TdescFragTag tdescFragTag) {
                     childDescription = TuningUtils.getTdescFragTagContent(tdescFragTag);
@@ -200,10 +200,10 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
             return;
         }
 
-        List<CompletionItem> completionItems = getCompletionItemsForChildren(iCompletionRequest, elementDescription.get());
-        for (CompletionItem completionItem : completionItems) {
-            iCompletionResponse.addCompletionItem(completionItem);
-        }
+        //List<CompletionItem> completionItems = getCompletionItemsForChildren(iCompletionRequest, elementDescription.get());
+        //for (CompletionItem completionItem : completionItems) {
+        //    iCompletionResponse.addCompletionItem(completionItem);
+        //}
         // TODO
         // for TunableVariant types -> also autocomplete the corresponding child element
     }

@@ -84,6 +84,11 @@ public class TuningUtils {
             return isTunableNodeMatchingDescription(node, getTdescFragTagContent(tdescFragTag));
         }
 
+        // check for empty xml tag
+        if (node.getNodeName() == null) {
+            return false;
+        }
+
         boolean isCorrectType = switch (node.getNodeName()) {
             case "C" -> description instanceof ClassElement;
             case "T" -> description instanceof Tunable || description instanceof EnumItem;
