@@ -20,11 +20,7 @@ class TuningDescriptionCompletionProviderTest {
             <!-- S4TK Group: 00000000 -->
             <I c="LootActions" i="action" m="interactions.utils.loot" n="Firegate1075:LootActions" s="16087474564407868122">
                 <L n="loot_actions">
-                    <E>
-                        content
-                    </E>
-                    <|
-                    <V t="">
+                    <V t="|">
                     </V>
                 </L>
             </I>

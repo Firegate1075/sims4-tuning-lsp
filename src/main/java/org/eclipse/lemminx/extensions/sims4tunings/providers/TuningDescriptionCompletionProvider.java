@@ -1,10 +1,8 @@
 package org.eclipse.lemminx.extensions.sims4tunings.providers;
 
-import org.eclipse.lemminx.dom.DOMNode;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.ContainerNode;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.INode;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.INodeWithChildren;
-import org.eclipse.lemminx.extensions.sims4tunings.models.TuningTreeDataModel.INode;
 import org.eclipse.lemminx.extensions.sims4tunings.util.TuningTreeParser;
 import org.eclipse.lemminx.extensions.sims4tunings.util.TuningUtils;
 import org.eclipse.lemminx.extensions.sims4tunings.models.TuningDescriptionDataModel.*;
@@ -16,7 +14,6 @@ import org.eclipse.lsp4j.TextEdit;
 import org.eclipse.lsp4j.jsonrpc.CancelChecker;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -244,12 +241,14 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
     public void onAttributeValue(String s, ICompletionRequest iCompletionRequest, ICompletionResponse iCompletionResponse, CancelChecker cancelChecker) throws Exception {
         LOGGER.info("Attribute value completion requested for attribute " + iCompletionRequest.getCurrentAttributeName() + " of element " + iCompletionRequest.getCurrentTag());
         Optional<ContainerNode> root = TuningTreeParser.parseTree(iCompletionRequest.getXMLDocument());
-        Optional<INode> node = TuningTreeParser.getNodeFromDOM(root.get(), iCompletionRequest.getNode()); // TODO: remove .get()
-
-        Optional<ITuningDescriptionElement> elementDescription = TuningUtils.getDescriptionOfNode(iCompletionRequest.getXMLDocument(), iCompletionRequest.getNode());
-        LOGGER.info("Element description: " + elementDescription);
-        if (elementDescription.isEmpty()) {
+        if (root.isEmpty()) {
             return;
+        }
+
+        INode node = TuningTreeParser.getNodeFromDOM(root.get(), iCompletionRequest.getNode()).orElseThrow();
+
+        if (node instanceof ContainerNode containerNode) {
+            getAttributeCompletionItemsForNode(iCompletionRequest, containerNode);
         }
 
         //List<CompletionItem> completionItems = getCompletionItemsForChildren(iCompletionRequest, elementDescription.get());
@@ -258,6 +257,73 @@ public class TuningDescriptionCompletionProvider implements ICompletionParticipa
         //}
         // TODO
         // for TunableVariant types -> also autocomplete the corresponding child element
+    }
+
+    private List<CompletionItem> getAttributeCompletionItemsForNode(ICompletionRequest request, ContainerNode containerNode) {
+        List<CompletionItem> items = new ArrayList<>();
+
+        String attributeName = request.getCurrentAttributeName();
+
+        INodeWithChildren parent = containerNode.parent();
+        if (parent instanceof ContainerNode parentContainer) {
+
+            ITuningDescriptionElement tuningDescription = containerNode.tuningDescription();
+            Optional<String> elementName = TuningUtils.getTuningDescriptionElementName(tuningDescription);
+            Optional<String> elementType = TuningUtils.getTuningDescriptionElementTypeName(tuningDescription);
+
+            if (attributeName.equals("t")) {
+                // completion for type attribute
+                // supports type of TunableVariant
+                // check for 1 child with n="" attribute
+
+            } else if (attributeName.equals("n")){
+                // completion for name attribute
+                // check if parent is a tunable variant with valid type
+                // if type is not valid suggest fitting (regarding tag) n="" attribute autocompletion, also updating the parent variants t="" attribute
+                if (parentContainer.tuningDescription() instanceof TunableVariant parentVariant) {
+                    // try to find the tuning description matching the parents t="" attribute
+                    Optional<String> parentType = Optional.ofNullable(parentContainer.domNode().getAttribute("t"));
+
+                    Optional<ITuningDescriptionElement> matchingVariantDescription = Optional.empty();
+                    if (parentType.isPresent()) {
+                        for (ITuningDescriptionElement variant : parentVariant.getTunableElements()) {
+                            if (!(variant instanceof ITunable tunable)) {
+                                break;
+                            }
+                            // check if the current tag fits the candidate variants type
+                            String variantType = TuningUtils.getTuningDescriptionElementTypeName(variant).orElseThrow();
+                            if (tunable.getTunableTag().equals(containerNode.domNode().getNodeName()) && variantType.equals(parentType.get()) {
+                                // found fitting child, suggest the type as a name
+                                //TODO: build completion item for attribute value variantType
+                                // TODO: check if the target node is the only child of the parent variant
+                            }
+                        }
+                    } // TODO: replace parentVariant.getTunableElements with TuningUtils call to resolve inherited elements, also resolve tdesc frags
+                } else {
+                    // for all others, suggest any child of the parent container, that matches the tag
+
+
+                    for (ITuningDescriptionElement variant : TuningUtils.getChildrenOfTuningDescriptionElement(parentContainer.tuningDescription())) {
+                        // resolve tdesc frag tags
+                        if (variant instanceof TdescFragTag tdescFragTag) {
+                            variant = TuningUtils.getTdescFragTagContent(tdescFragTag);
+                        }
+
+                        if (!(variant instanceof ITunable tunable)) {
+                            break;
+                        }
+                        // check if the current tag fits the candidate variant
+                        if (tunable.getTunableTag().equals(containerNode.domNode().getNodeName())) {
+                            // found fitting child, suggest the type as a name
+                            Optional<String> variantName = TuningUtils.getTuningDescriptionElementName(variant);
+                            //TODO: build completion item for attribute value variantName
+                        }
+                    }
+                }
+            }
+        }
+
+        return items;
     }
 
     @Override
